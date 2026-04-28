@@ -1,0 +1,240 @@
+name: pacman_application
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  audioplayers: ^6.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  assets:
+    - assets/audio/Coffee_Break_Music.mp3
+    - assets/audio/Credit_Sound.mp3
+    - assets/audio/Extended_Sound.mp3
+    - assets/audio/Fail.mp3
+    - assets/audio/Game_Play.mp3
+    - assets/audio/Ghost_Normal_Move.mp3
+    - assets/audio/Ghost_Return_To_Home.mp3
+    - assets/audio/Ghost_Turn_To_Blue.mp3
+    - assets/audio/Pacman_Eating_Dots_While_Turning_The_Corner.mp3
+    - assets/audio/Pacman_Eating_Dots.mp3
+    - assets/audio/Pacman_Eating_The_Fruit.mp3
+    - assets/audio/Pacman_Eating_The_Ghost.mp3
+    - assets/audio/Spurt_Move_1.mp3
+    - assets/audio/Spurt_Move_2.mp3
+    - assets/audio/Spurt_Move_3.mp3
+    - assets/audio/Spurt_Move_4.mp3
+    - assets/audio/Start_Music.mp3
+
+    - assets/game/map/map.png
+    - assets/game/pacman.png
+
+    - assets/game/characters/pacman/up/pacman_up_0.png
+    - assets/game/characters/pacman/up/pacman_up_1.png
+    - assets/game/characters/pacman/up/pacman_up_2.png
+    - assets/game/characters/pacman/left/pacman_left_0.png
+    - assets/game/characters/pacman/left/pacman_left_1.png
+    - assets/game/characters/pacman/left/pacman_left_2.png
+    - assets/game/characters/pacman/right/pacman_right_0.png
+    - assets/game/characters/pacman/right/pacman_right_1.png
+    - assets/game/characters/pacman/right/pacman_right_2.png
+    - assets/game/characters/pacman/down/pacman_down_0.png
+    - assets/game/characters/pacman/down/pacman_down_1.png
+    - assets/game/characters/pacman/down/pacman_down_2.png
+    - assets/game/characters/pacman/idle/pacman_idle_0.png
+    - assets/game/characters/pacman/death/pacman_death_0.png
+    - assets/game/characters/pacman/death/pacman_death_1.png
+    - assets/game/characters/pacman/death/pacman_death_2.png
+    - assets/game/characters/pacman/death/pacman_death_3.png
+    - assets/game/characters/pacman/death/pacman_death_4.png
+    - assets/game/characters/pacman/death/pacman_death_5.png
+    - assets/game/characters/pacman/death/pacman_death_6.png
+    - assets/game/characters/pacman/death/pacman_death_7.png
+    - assets/game/characters/pacman/death/pacman_death_8.png
+    - assets/game/characters/pacman/death/pacman_death_9.png
+    - assets/game/characters/pacman/death/pacman_death_10.png
+    - assets/game/characters/pacman/death/pacman_death_11.png
+
+    - assets/game/characters/blinky/up/blinky_up_0.png
+    - assets/game/characters/blinky/up/blinky_up_1.png
+    - assets/game/characters/blinky/left/blinky_left_0.png
+    - assets/game/characters/blinky/left/blinky_left_1.png
+    - assets/game/characters/blinky/right/blinky_right_0.png
+    - assets/game/characters/blinky/right/blinky_right_1.png
+    - assets/game/characters/blinky/down/blinky_down_0.png
+    - assets/game/characters/blinky/down/blinky_down_1.png
+    - assets/game/characters/blinky/frightened0/blinky_frightened0_0.png
+    - assets/game/characters/blinky/frightened0/blinky_frightened0_1.png
+    - assets/game/characters/blinky/frightened0/blinky_frightened0_2.png
+    - assets/game/characters/blinky/frightened0/blinky_frightened0_3.png
+    - assets/game/characters/blinky/frightened1/blinky_frightened1_0.png
+    - assets/game/characters/blinky/frightened1/blinky_frightened1_1.png
+    - assets/game/characters/blinky/frightened1/blinky_frightened1_2.png
+    - assets/game/characters/blinky/frightened1/blinky_frightened1_3.png
+    - assets/game/characters/blinky/eatenUp/blinky_eatenUp_0.png
+    - assets/game/characters/blinky/eatenLeft/blinky_eatenLeft_0.png
+    - assets/game/characters/blinky/eatenRight/blinky_eatenRight_0.png
+    - assets/game/characters/blinky/eatenDown/blinky_eatenDown_0.png
+
+    - assets/game/characters/pinky/up/pinky_up_0.png
+    - assets/game/characters/pinky/up/pinky_up_1.png
+    - assets/game/characters/pinky/left/pinky_left_0.png
+    - assets/game/characters/pinky/left/pinky_left_1.png
+    - assets/game/characters/pinky/right/pinky_right_0.png
+    - assets/game/characters/pinky/right/pinky_right_1.png
+    - assets/game/characters/pinky/down/pinky_down_0.png
+    - assets/game/characters/pinky/down/pinky_down_1.png
+    - assets/game/characters/pinky/frightened0/pinky_frightened0_0.png
+    - assets/game/characters/pinky/frightened0/pinky_frightened0_1.png
+    - assets/game/characters/pinky/frightened0/pinky_frightened0_2.png
+    - assets/game/characters/pinky/frightened0/pinky_frightened0_3.png
+    - assets/game/characters/pinky/frightened1/pinky_frightened1_0.png
+    - assets/game/characters/pinky/frightened1/pinky_frightened1_1.png
+    - assets/game/characters/pinky/frightened1/pinky_frightened1_2.png
+    - assets/game/characters/pinky/frightened1/pinky_frightened1_3.png
+    - assets/game/characters/pinky/eatenUp/pinky_eatenUp_0.png
+    - assets/game/characters/pinky/eatenLeft/pinky_eatenLeft_0.png
+    - assets/game/characters/pinky/eatenRight/pinky_eatenRight_0.png
+    - assets/game/characters/pinky/eatenDown/pinky_eatenDown_0.png
+
+    - assets/game/characters/inky/up/inky_up_0.png
+    - assets/game/characters/inky/up/inky_up_1.png
+    - assets/game/characters/inky/left/inky_left_0.png
+    - assets/game/characters/inky/left/inky_left_1.png
+    - assets/game/characters/inky/right/inky_right_0.png
+    - assets/game/characters/inky/right/inky_right_1.png
+    - assets/game/characters/inky/down/inky_down_0.png
+    - assets/game/characters/inky/down/inky_down_1.png
+    - assets/game/characters/inky/frightened0/inky_frightened0_0.png
+    - assets/game/characters/inky/frightened0/inky_frightened0_1.png
+    - assets/game/characters/inky/frightened0/inky_frightened0_2.png
+    - assets/game/characters/inky/frightened0/inky_frightened0_3.png
+    - assets/game/characters/inky/frightened1/inky_frightened1_0.png
+    - assets/game/characters/inky/frightened1/inky_frightened1_1.png
+    - assets/game/characters/inky/frightened1/inky_frightened1_2.png
+    - assets/game/characters/inky/frightened1/inky_frightened1_3.png
+    - assets/game/characters/inky/eatenUp/inky_eatenUp_0.png
+    - assets/game/characters/inky/eatenLeft/inky_eatenLeft_0.png
+    - assets/game/characters/inky/eatenRight/inky_eatenRight_0.png
+    - assets/game/characters/inky/eatenDown/inky_eatenDown_0.png
+
+    - assets/game/characters/clyde/up/clyde_up_0.png
+    - assets/game/characters/clyde/up/clyde_up_1.png
+    - assets/game/characters/clyde/left/clyde_left_0.png
+    - assets/game/characters/clyde/left/clyde_left_1.png
+    - assets/game/characters/clyde/right/clyde_right_0.png
+    - assets/game/characters/clyde/right/clyde_right_1.png
+    - assets/game/characters/clyde/down/clyde_down_0.png
+    - assets/game/characters/clyde/down/clyde_down_1.png
+    - assets/game/characters/clyde/frightened0/clyde_frightened0_0.png
+    - assets/game/characters/clyde/frightened0/clyde_frightened0_1.png
+    - assets/game/characters/clyde/frightened0/clyde_frightened0_2.png
+    - assets/game/characters/clyde/frightened0/clyde_frightened0_3.png
+    - assets/game/characters/clyde/frightened1/clyde_frightened1_0.png
+    - assets/game/characters/clyde/frightened1/clyde_frightened1_1.png
+    - assets/game/characters/clyde/frightened1/clyde_frightened1_2.png
+    - assets/game/characters/clyde/frightened1/clyde_frightened1_3.png
+    - assets/game/characters/clyde/eatenUp/clyde_eatenUp_0.png
+    - assets/game/characters/clyde/eatenLeft/clyde_eatenLeft_0.png
+    - assets/game/characters/clyde/eatenRight/clyde_eatenRight_0.png
+    - assets/game/characters/clyde/eatenDown/clyde_eatenDown_0.png
+
+    - assets/game/bonuses/cherry.png
+    - assets/game/bonuses/strawberry.png
+    - assets/game/bonuses/orange.png
+    - assets/game/bonuses/apple.png
+    - assets/game/bonuses/melon.png
+    - assets/game/bonuses/galaxian.png
+    - assets/game/bonuses/bell.png
+    - assets/game/bonuses/key.png
+
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  fonts:
+    - family: PacFont
+      fonts:
+        - asset: assets/fonts/PacFont.ttf
+    
+    - family: PressStart
+      fonts:
+        - asset: assets/fonts/PressStart.ttf
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
