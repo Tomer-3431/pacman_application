@@ -1,6 +1,5 @@
 import 'dart:collection';
 import 'dart:math';
-import 'package:flutter/animation.dart';
 import 'package:pacman_application/game/animation/animated_character.dart';
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
