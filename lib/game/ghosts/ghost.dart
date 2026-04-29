@@ -124,7 +124,7 @@ abstract class Ghost extends AnimatedCharacter {
         state = GhostState.eaten;
         onEaten?.call();
       } else if (state == GhostState.chase || state == GhostState.scatter) {
-        // onDeath?.call();
+        onDeath?.call();
       }
     }
   }

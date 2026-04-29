@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
 import 'package:pacman_application/game/ghosts/ghost.dart';

@@ -1,7 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:pacman_application/database/login.dart';
+import 'package:pacman_application/firebase_options.dart';
 import 'package:pacman_application/game/game_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -29,9 +35,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: .fromSeed(seedColor: Colors.yellow),
       ),
-      home: GameManager(context).currentScreen,
+      debugShowCheckedModeBanner: false,
+      home: Login(),
+      // home: GameManager(context).currentScreen,
       // home: GameWidget(game: Test())
     );
   }

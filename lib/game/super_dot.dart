@@ -6,7 +6,7 @@ class SuperDot extends StatelessWidget {
   bool isEaten = false; 
   final void Function() onEaten;
 
-  SuperDot(this.x, this.y, {required this.onEaten}) {
+  SuperDot(this.x, this.y, {super.key, required this.onEaten}) {
     isEaten = false;
   }
 

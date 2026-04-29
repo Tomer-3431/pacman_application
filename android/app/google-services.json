@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "391973598755",
+    "firebase_url": "https://pacman-school-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "pacman-school",
+    "storage_bucket": "pacman-school.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391973598755:android:c6f9cb7212f42c115aa396",
+        "android_client_info": {
+          "package_name": "com.example.pacman_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-i3m8tWc91L3hzah7_vnD1_S1i64DKG8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

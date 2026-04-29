@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:pacman_application/game/bonus.dart';
 import 'package:pacman_application/game/controller/controller.dart';
+import 'package:pacman_application/game/controller/retry_button.dart';
 import 'package:pacman_application/game/game_constants.dart';
 import 'package:pacman_application/game/game_map.dart';
 import 'package:pacman_application/game/game_screen.dart';
@@ -16,13 +16,10 @@ import 'package:pacman_application/game/pacman.dart';
 
 class GameManager {
   int score = 0;
+  int highScore = 0;
   int screenNum = 0;
   int currentGhostEatenScore = 0;
   int nextGhostEatenScore = 10;
-
-  bool isSFX = false;
-
-  double volume = 0;
 
   late List<GameTimer> gameTimers = [bonusTimer];
 
@@ -31,21 +28,8 @@ class GameManager {
     onDotEaten: () {
       if ((score % 100) >= 99) {
         lives++;
-        isSFX = true;
-        audioPlayer.setReleaseMode(ReleaseMode.stop);
-        audioPlayer.play(
-          AssetSource("audio/Extended_Sound.mp3"),
-          volume: volume,
-        );
       }
       score += 1;
-      isSFX = true;
-      audioPlayer.setReleaseMode(ReleaseMode.stop);
-      audioPlayer.play(
-        AssetSource("audio/Pacman_Eating_Dots.mp3"),
-        volume: volume,
-        position: Duration(seconds: 10),
-      );
     },
     onSuperDotEaten: () {
       if ((score % 100) >= 90) lives++;
@@ -86,6 +70,8 @@ class GameManager {
 
   late final Pacman pacman = Pacman(gameManager: this);
 
+  bool isGameOver = false;
+
   late final Controller controller = Controller(
     onDirectionChanged: (direction) {
       pacman.nextDirection = direction;
@@ -106,7 +92,12 @@ class GameManager {
     dt: dt,
     bonus: bonus,
     bonusesTaken: bonusesTaken,
+    getHighScore: () => highScore,
+    isGameOver: () => isGameOver,
+    retryButton: retryButton,
   );
+
+  late RetryButton retryButton = RetryButton(size: 120, onRetry: onRetry, onExit: onExit,);
 
   bool paused = false;
 
@@ -114,8 +105,6 @@ class GameManager {
     paused = true;
 
     pacman.playDeath();
-    audioPlayer.setReleaseMode(ReleaseMode.release);
-    audioPlayer.play(AssetSource("audio/Fail.mp3"), volume: volume);
     Timer(Duration(seconds: 3), () {
       paused = false;
       for (var ghost in ghosts) {
@@ -125,6 +114,8 @@ class GameManager {
       // gameMap.reset();
       lives--;
       if (lives <= 0) {
+        isGameOver = true;
+
         gameMessege = Text(
           "GAME OVER!",
           style: TextStyle(
@@ -137,6 +128,7 @@ class GameManager {
           ghost.state = GhostState.idle;
         }
         periodicTimer.cancel();
+        onGameOver.call(score);
       }
     });
   }
@@ -172,9 +164,6 @@ class GameManager {
   late Stopwatch stopwatch = Stopwatch();
   double lastTime = 0;
 
-  AudioPlayer audioPlayer = AudioPlayer();
-  BGMusic currentBGMusic = BGMusic.start;
-
   void onBonus(BonusType type) {
     bonusesTaken.add(type);
     if (score % 100 >= 90) lives++;
@@ -191,13 +180,48 @@ class GameManager {
     isLoop: true,
   );
 
-  GameManager(BuildContext context) {
-    audioPlayer.setReleaseMode(ReleaseMode.release);
+  late void Function(int score) onGameOver;
+  late void Function() onRetry;
+  int Function()? getHighScoreFromDisplayer;
+  late void Function() onExit;
 
-    audioPlayer.play(AssetSource("audio/Start_Music.mp3"), volume: volume);
+  GameManager({
+    bool start = false,
+    int Function()? highScore,
+    void Function(int score)? onGameOver,
+    void Function()? onRetry,
+    void Function()? onExit,
+  }) {
+    if (onGameOver != null) {
+      this.onGameOver = onGameOver;
+    } else {
+      this.onGameOver = (x) {};
+    }
+
+    if (highScore != null) {
+      this.highScore = highScore();
+      getHighScoreFromDisplayer = highScore;
+    }
+
+    if (onRetry != null) {
+      this.onRetry = onRetry;
+    } else {
+      this.onRetry = () {};
+    }
+
+    if (onExit != null) {
+      this.onExit = onExit;
+    } else {
+      this.onExit = () {};
+    }
+
+    if (start) initGame();
+  }
+
+  void initGame() {
+    highScore = getHighScoreFromDisplayer?.call() ?? highScore;
     Timer(Duration(seconds: 3), () {
       gameMessege = Container();
-      audioPlayer.setReleaseMode(ReleaseMode.loop);
       bonusTimer.start();
       stopwatch.start();
       periodicTimer = Timer.periodic(
@@ -242,50 +266,14 @@ class GameManager {
     }
     Inky.setBlinkyLocation(ghosts[0].x, ghosts[0].y);
     bonus.update(dt);
+    if (score > highScore) {
+      highScore = score;
+    }
 
-    BGMusic neededMusic = BGMusic.chase;
     for (var ghost in ghosts) {
       ghost.update(dt);
-      if (ghost.state == GhostState.eaten) {
-        neededMusic = BGMusic.eaten;
-      } else if (neededMusic == BGMusic.chase &&
-          (ghost.state == GhostState.frightened0 ||
-              ghost.state == GhostState.frightened1)) {
-        neededMusic = BGMusic.blue;
-      }
     }
 
-    if (!isSFX && neededMusic != currentBGMusic) {
-      audioPlayer.setReleaseMode(ReleaseMode.loop);
-
-      switch (neededMusic) {
-        case BGMusic.chase:
-          audioPlayer.play(
-            AssetSource("audio/Ghost_Normal_Move.mp3"),
-            volume: volume,
-          );
-          break;
-
-        case BGMusic.blue:
-          audioPlayer.play(
-            AssetSource("audio/Ghost_Turn_To_Blue.mp3"),
-            volume: volume,
-          );
-          break;
-
-        case BGMusic.eaten:
-          audioPlayer.play(
-            AssetSource("audio/Ghost_Return_To_Home.mp3"),
-            volume: volume,
-          );
-          break;
-
-        default:
-          break;
-      }
-    }
-
-    currentBGMusic = neededMusic;
     if (!hasUpdatedNextScreen && gameMap.leftDots == 0) {
       paused = true;
       hasUpdatedNextScreen = true;
@@ -305,5 +293,3 @@ class GameManager {
     }
   }
 }
-
-enum BGMusic { start, chase, blue, eaten, fail }

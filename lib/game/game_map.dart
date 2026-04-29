@@ -1,8 +1,4 @@
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:pacman_application/game/controller/controller.dart';
 import 'package:pacman_application/game/direction.dart';
 import 'package:pacman_application/game/dot.dart';
 import 'package:pacman_application/game/super_dot.dart';
@@ -81,8 +77,12 @@ class GameMap {
   }
 
   void reset() {
-    dots.forEach((dot) => dot.reset());
-    superPoints.forEach((superDot) => superDot.reset());
+    for (var dot in dots) {
+      dot.reset();
+    }
+    for (var superDot in superPoints) {
+      superDot.reset();
+    }
     leftDots = dots.length + superPoints.length;
   }
 

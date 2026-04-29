@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:pacman_application/game/bonus.dart';
 import 'package:pacman_application/game/controller/controller.dart';
+import 'package:pacman_application/game/controller/retry_button.dart';
 import 'package:pacman_application/game/game_map.dart';
 import 'package:pacman_application/game/ghosts/ghost.dart';
 import 'package:pacman_application/game/pacman.dart';
@@ -18,15 +19,20 @@ class GameScreen extends StatefulWidget {
     required this.pacman,
     required this.getScore,
     required this.getLives,
+    required this.getHighScore,
     required this.ghosts,
     required this.bonus,
     required this.dt,
     required this.bonusesTaken,
+    required this.retryButton,
+    required this.isGameOver
   });
 
   final Widget Function() gameMessege;
   final String Function() topText;
   final Controller controller;
+  final RetryButton retryButton;
+  final bool Function() isGameOver;
   final Pacman pacman;
   final List<Ghost> ghosts;
   final Bonus bonus;
@@ -34,6 +40,7 @@ class GameScreen extends StatefulWidget {
   final GameMap gameMap;
   final int Function() getScore;
   final int Function() getLives;
+  final int Function() getHighScore;
   final double dt;
 
   @override
@@ -80,7 +87,7 @@ class _GameScreenState extends State<GameScreen> {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: 20,
           children: [
@@ -120,10 +127,12 @@ class _GameScreenState extends State<GameScreen> {
               ],
             ),
 
-            SizedBox(height: 15, child: buildBonusArea(widget.bonusesTaken)),
+            buildBonusArea(widget.bonusesTaken),
 
             // const Spacer(),
-            widget.controller,
+            widget.isGameOver()
+              ? widget.retryButton
+              : widget.controller,
           ],
         ),
       ),
@@ -135,16 +144,34 @@ class _GameScreenState extends State<GameScreen> {
       height: 50,
       color: Colors.black,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         spacing: 40,
         children: [
-          Text(
-            widget.getScore().toString(),
-            style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "SCORE",
+                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 15),
+              ),
+              Text(
+                widget.getScore().toString(),
+                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 20),
+              ),
+            ],
           ),
-          Text(
-            widget.topText(),
-            style: TextStyle(fontFamily: "PacFont", color: Colors.white, fontSize: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "HIGH SCORE",
+                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 15),
+              ),
+              Text(
+                widget.getHighScore().toString(),
+                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 20),
+              ),
+            ],
           ),
           buildLives(widget.getLives() - 1),
           // Text("Lives: ${widget.getLives()}", style: TextStyle(color: Colors.white, fontSize: 20),),
@@ -178,25 +205,22 @@ class _GameScreenState extends State<GameScreen> {
     return SizedBox(width: 50);
   }
 
-  Widget buildBonusArea(List<BonusType> bonuses) => Expanded(
-    child: Padding(
-      padding: const EdgeInsets.all(2.0),
-      child: bonuses.isNotEmpty
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: bonuses
-                  .map(
-                    (bonusType) => Image.asset(
-                      "${Bonus.bonusAssetsPath}${bonusType.name}${Bonus.bonusesAssetsEndFile}",
-                      scale: 0.8,
-                    ),
-                  )
-                  .toList()
-                  .sublist(0, min(8, bonuses.length)),
-            )
-          : SizedBox(height: 5),
-    ),
+  Widget buildBonusArea(List<BonusType> bonuses) => Padding(
+    padding: const EdgeInsets.all(2.0),
+    child: bonuses.isNotEmpty
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: bonuses
+                .map(
+                  (bonusType) => Image.asset(
+                    "${Bonus.bonusAssetsPath}${bonusType.name}${Bonus.bonusesAssetsEndFile}",
+                  ),
+                )
+                .toList()
+                .sublist(0, min(8, bonuses.length)),
+          )
+        : SizedBox(height: 5),
   );
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -59,16 +58,19 @@ class DpadButtonState extends State<DpadButton> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: _isPressed ? Colors.grey[700] : Colors.grey[900],
-        border: Border.all(color: _isPressed ? Colors.amber : Colors.grey[700]!, width: 2),
+        border: Border.all(
+          color: _isPressed ? Colors.amber : Colors.grey[700]!,
+          width: 2,
+        ),
         boxShadow: _isPressed
             ? []
             : [
-          BoxShadow(
-            color: const Color(0x7F000000),
-            offset: const Offset(0, 2),
-            blurRadius: 4,
-          ),
-        ],
+                BoxShadow(
+                  color: const Color(0x7F000000),
+                  offset: const Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
       ),
       child: Icon(
         widget.icon,

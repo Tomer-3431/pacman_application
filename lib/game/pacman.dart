@@ -35,7 +35,7 @@ class Pacman extends AnimatedCharacter {
   late SpriteAnimation leftAnimation;
 
   @override
-  late List<SpriteAnimation> animations = [
+  List<SpriteAnimation> get animations => [
     deathAnimation,
     idleAnimation,
     upAnimation,
@@ -142,6 +142,9 @@ class Pacman extends AnimatedCharacter {
         x += speed * dt;
         break;
     }
+
+    x = x.clamp(0, getGameMap().kCols).toDouble();
+    y = y.clamp(0, getGameMap().kRows).toDouble();
 
     if (getGameMap().map[y.round()][x.round()] == GameMap.kTunnel) {
       if (x < 1) {
