@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/game_manager.dart';
 import 'package:pacman_application/game/pacman.dart';
-import 'package:pacman_application/util.dart';
+import 'package:pacman_application/utils/util.dart';
 
 class Bonus {
   String name = "Bonus";

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:pacman_application/screens/appbar.dart';
+import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/screens/home_screen.dart';
 
 class LoadingScreen extends StatefulWidget {

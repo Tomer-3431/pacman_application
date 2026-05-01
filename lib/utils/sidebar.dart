@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pacman_application/database/session.dart';
 import 'package:pacman_application/screens/credit.dart';
 import 'package:pacman_application/screens/collectables_screen.dart';
-import 'package:pacman_application/screens/game_displayer.dart';
+import 'package:pacman_application/utils/game_displayer.dart';
 import 'package:pacman_application/screens/home_screen.dart';
 import 'package:pacman_application/screens/leaderboard.dart';
 import 'package:pacman_application/screens/rules.dart';

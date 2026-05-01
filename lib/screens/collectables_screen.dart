@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
-import 'package:pacman_application/screens/appbar.dart';
-import 'package:pacman_application/screens/sidebar.dart';
+import 'package:pacman_application/utils/appbar.dart';
+import 'package:pacman_application/utils/sidebar.dart';
 import 'package:pacman_application/utils/bonus_card.dart';
 
 class CollectablesScreen extends StatefulWidget {

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/database/session.dart';
-import 'package:pacman_application/screens/game_displayer.dart';
-import 'package:pacman_application/screens/appbar.dart';
-import 'package:pacman_application/screens/sidebar.dart';
+import 'package:pacman_application/utils/bonus_type.dart';
+import 'package:pacman_application/utils/game_displayer.dart';
+import 'package:pacman_application/utils/appbar.dart';
+import 'package:pacman_application/utils/sidebar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +16,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  double progress = 0.75;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // _getBonusProgress();
+  }
+
+  void _getBonusProgress() {
+    int num = 0;
+    for (MapEntry<BonusType, int> entry in currentUser.bonusTable.entries) {
+      if (entry.value > 0) num++;
+    }
+
+    progress = num / currentUser.bonusTable.length;
+  }
 
   @override
   void dispose() {
@@ -66,8 +84,32 @@ class HomeScreenState extends State<HomeScreen> {
                 children: [
                   Icon(Icons.emoji_events, color: Colors.amber[600], size: 80),
                   Text(
-                    "Your High Score\nis currently ${currentUser.highScore},\ncongratulation",
+                    "Your high score\nis currently ${currentUser.highScore},\ncongratulation",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                ],
+              ),
+
+              Spacer(),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                spacing: 20,
+                children: [
+                  Text(
+                    "You have collected\n${progress * 100}% from all the\ncollectables",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+
+                  Expanded(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: CircularProgressIndicator(
+                        value: progress,
+                        color: Colors.blue[900],
+                        strokeWidth: 10,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -110,42 +152,7 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Spacer(),
-
-              // ElevatedButton(
-              //   onPressed: () {
-              //     if (kDebugMode) {
-              //       print(currentUser);
-              //     }
-              //   },
-              //   child: Text(
-              //     "PRINT USER DATA",
-              //     style: TextStyle(
-              //       fontFamily: "PressStart",
-              //       fontSize: 20,
-              //       color: Colors.black
-              //     ),
-              //   ),
-              // ),
-
-              // Spacer(),
-
-              ElevatedButton(
-                onPressed: () async {
-                  final ref = FirebaseDatabase.instance.ref("users/${currentUser.uid}");
-                  currentUser.setData(ref);
-                }, 
-                child: Text(
-                  "SAVE USER DATA",
-                  style: TextStyle(
-                    fontFamily: "PressStart",
-                    fontSize: 20,
-                    color: Colors.black
-                  ),
-                ),
-              ),
-              // Spacer(),
-              Spacer()
+              Spacer(),
             ],
           ),
         ),
