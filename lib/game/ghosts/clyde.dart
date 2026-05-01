@@ -1,7 +1,7 @@
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
 import 'package:pacman_application/game/ghosts/ghost.dart';
-import 'package:pacman_application/util.dart';
+import 'package:pacman_application/utils/util.dart';
 
 class Clyde extends Ghost {
   @override

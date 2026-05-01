@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pacman_application/constants.dart';
-import 'package:pacman_application/util.dart';
+import 'package:pacman_application/utils/util.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 
 class GameUser {

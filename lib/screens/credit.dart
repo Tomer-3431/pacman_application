@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman_application/constants.dart';
-import 'package:pacman_application/screens/appbar.dart';
-import 'package:pacman_application/screens/sidebar.dart';
+import 'package:pacman_application/utils/appbar.dart';
+import 'package:pacman_application/utils/sidebar.dart';
 
 class Credit extends StatefulWidget {
   const Credit({super.key});

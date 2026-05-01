@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman_application/constants.dart';
-import 'package:pacman_application/screens/appbar.dart';
+import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/screens/login.dart';
 
 class ForgotPassword extends StatefulWidget {

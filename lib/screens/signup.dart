@@ -7,7 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/database/game_user.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
-import 'package:pacman_application/screens/appbar.dart';
+import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/screens/login.dart';
 import 'package:pacman_application/database/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
