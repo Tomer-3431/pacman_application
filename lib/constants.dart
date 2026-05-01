@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:pacman_application/utils/bonus_type.dart';
 
 /// 0: empty space
 /// 1: wall
@@ -41,3 +43,26 @@ const List<List<int>> defaultMap = [
     [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
+
+const Color pacmanColor = Color(0xFFFFFF00);
+
+const TextStyle headerTextStyle = TextStyle(
+  fontFamily: "Pacfont",
+  fontSize: 25,
+  fontWeight: FontWeight.bold
+);
+
+const String anonymousId = "0";
+const String anonymousName = "Guest";
+const int anonymousHighScore = 0;
+const String anonymousEmail = "name@gmail.com";
+const Map<BonusType, int> anonymousBonusTable = {
+  BonusType.apple: 0,
+  BonusType.bell: 0,
+  BonusType.cherry: 0,
+  BonusType.galaxian: 0,
+  BonusType.key: 0,
+  BonusType.melon: 0,
+  BonusType.orange: 0,
+  BonusType.strawberry: 0
+};

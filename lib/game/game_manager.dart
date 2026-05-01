@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/game/bonus.dart';
+import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/controller/controller.dart';
 import 'package:pacman_application/game/controller/retry_button.dart';
-import 'package:pacman_application/game/game_constants.dart';
-import 'package:pacman_application/game/game_map.dart';
+import 'package:pacman_application/game/map/game_map.dart';
 import 'package:pacman_application/game/game_screen.dart';
 import 'package:pacman_application/game/game_timer.dart';
 import 'package:pacman_application/game/ghosts/blinky.dart';
@@ -153,7 +154,7 @@ class GameManager {
   Widget gameMessege = Text(
     "READY!",
     style: TextStyle(
-      color: Colors.yellow,
+      color: pacmanColor,
       fontSize: 30,
       fontWeight: FontWeight.bold,
     ),
@@ -168,6 +169,7 @@ class GameManager {
     bonusesTaken.add(type);
     if (score % 100 >= 90) lives++;
     score += 10;
+    onGettingBonus(type);
   }
 
   late List<BonusType> bonusesTaken = [];
@@ -184,6 +186,7 @@ class GameManager {
   late void Function() onRetry;
   int Function()? getHighScoreFromDisplayer;
   late void Function() onExit;
+  late void Function(BonusType) onGettingBonus;
 
   GameManager({
     bool start = false,
@@ -191,6 +194,7 @@ class GameManager {
     void Function(int score)? onGameOver,
     void Function()? onRetry,
     void Function()? onExit,
+    void Function(BonusType bonus)? onGettingBonus
   }) {
     if (onGameOver != null) {
       this.onGameOver = onGameOver;
@@ -213,6 +217,12 @@ class GameManager {
       this.onExit = onExit;
     } else {
       this.onExit = () {};
+    }
+    
+    if (onGettingBonus != null) {
+      this.onGettingBonus = onGettingBonus;
+    } else {
+      this.onGettingBonus = (x) {};
     }
 
     if (start) initGame();

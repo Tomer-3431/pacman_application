@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/game/animation/animated_character.dart';
 import 'package:pacman_application/game/direction.dart';
-import 'package:pacman_application/game/game_map.dart';
+import 'package:pacman_application/game/map/game_map.dart';
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 
 class Pacman extends AnimatedCharacter {
@@ -165,11 +166,11 @@ class Pacman extends AnimatedCharacter {
     acceleration = 240;
   }
 
-  Widget nextDirectionArrow(double tileSize) {
+  Widget nextDirectionArrow(double tileSize, {Color? color}) {
     return Positioned(
       left: (x + nextDirection.toDelta().$1) * tileSize,
       top: (y + nextDirection.toDelta().$2) * tileSize,
-      child: Transform.rotate(angle: nextDirection.toAngle() ,child: Icon(Icons.arrow_drop_up_sharp, color: Colors.yellow, size: tileSize)),
+      child: Transform.rotate(angle: nextDirection.toAngle() ,child: Icon(Icons.arrow_drop_up_sharp, color: color ?? pacmanColor, size: tileSize)),
     );
   }
 

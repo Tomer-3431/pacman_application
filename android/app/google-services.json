@@ -13,7 +13,20 @@
           "package_name": "com.example.pacman_application"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "391973598755-0eee74k9ftjog8kfeo484mr2ub6j6vu5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pacman_application",
+            "certificate_hash": "2355de823293776f2e53a561b6e2ae77d41f511b"
+          }
+        },
+        {
+          "client_id": "391973598755-vp0ifapi6iji5iavi89kfbiq5gih1vsu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA-i3m8tWc91L3hzah7_vnD1_S1i64DKG8"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "391973598755-vp0ifapi6iji5iavi89kfbiq5gih1vsu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "391973598755-rqg9ni3iia3vmq19p8i410un9iebnmki.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pacmanApplication"
+              }
+            }
+          ]
         }
       }
     }

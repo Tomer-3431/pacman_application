@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:pacman_application/database/login.dart';
-import 'package:pacman_application/firebase_options.dart';
-import 'package:pacman_application/game/game_manager.dart';
+import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/screens/login.dart';
+import 'package:pacman_application/database/firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await SharedPreferences.getInstance();
 
   runApp(const MyApp());
 }
@@ -35,12 +37,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.yellow),
+        fontFamily: "BJCree",
+        colorScheme: .fromSeed(seedColor: pacmanColor),
       ),
       debugShowCheckedModeBanner: false,
       home: Login(),
-      // home: GameManager(context).currentScreen,
-      // home: GameWidget(game: Test())
     );
   }
 }

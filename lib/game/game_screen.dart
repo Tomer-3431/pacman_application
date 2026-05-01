@@ -3,11 +3,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:pacman_application/game/bonus.dart';
+import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/controller/controller.dart';
 import 'package:pacman_application/game/controller/retry_button.dart';
-import 'package:pacman_application/game/game_map.dart';
+import 'package:pacman_application/game/map/game_map.dart';
 import 'package:pacman_application/game/ghosts/ghost.dart';
 import 'package:pacman_application/game/pacman.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -51,9 +53,13 @@ class _GameScreenState extends State<GameScreen> {
   Timer? _timer;
   double time = 0;
 
+  Color? customPacmanColor;
+
   @override
   void initState() {
     super.initState();
+
+    getColors();
 
     _timer = Timer.periodic(
       Duration(milliseconds: (widget.dt * 1000).round()),
@@ -62,6 +68,21 @@ class _GameScreenState extends State<GameScreen> {
         setState(() {});
       },
     );
+  }
+
+  void getColors() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final a = prefs.getInt("pacmanColor/a");
+    final r = prefs.getInt("pacmanColor/r");
+    final g = prefs.getInt("pacmanColor/g");
+    final b = prefs.getInt("pacmanColor/b");
+
+    if (a == null || r == null || g == null || b == null) {
+      return;
+    }
+
+    customPacmanColor = Color.fromARGB(a, r, g, b);
   }
 
   @override
@@ -121,8 +142,8 @@ class _GameScreenState extends State<GameScreen> {
                   (superDot) => superDot.showOnStack(tileSize),
                 ),
                 ...widget.ghosts.map((ghost) => ghost.getSprite(tileSize)),
-                widget.pacman.getSprite(tileSize),
-                widget.pacman.nextDirectionArrow(tileSize),
+                widget.pacman.getSprite(tileSize, color: customPacmanColor),
+                widget.pacman.nextDirectionArrow(tileSize, color: customPacmanColor),
                 widget.bonus.getSprite(tileSize),
               ],
             ),

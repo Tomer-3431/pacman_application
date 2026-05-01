@@ -1,11 +1,11 @@
-import 'dart:async';
-
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/database/session.dart';
-import 'package:pacman_application/game/game_displayer.dart';
-import 'package:pacman_application/home/appbar.dart';
-import 'package:pacman_application/home/sidebar.dart';
+import 'package:pacman_application/screens/game_displayer.dart';
+import 'package:pacman_application/screens/appbar.dart';
+import 'package:pacman_application/screens/sidebar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,21 +15,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  late Timer _startTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer = Timer(Duration(milliseconds: 400), () {
-      print(currentUser.haveInitalized());
-      setState(() {});
-    });
-  }
 
   @override
   void dispose() {
     super.dispose();
-    _startTimer.cancel();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitDown,
       DeviceOrientation.portraitUp,
@@ -45,7 +34,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: Appbar(
         context: context,
-        header: Text("Home Screen", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, fontFamily: "Pacfont"),),
+        header: Text("HOME SCREEN", style: headerTextStyle),
       ),
       drawer: Sidebar(),
       body: SafeArea(
@@ -76,8 +65,10 @@ class HomeScreenState extends State<HomeScreen> {
                 spacing: 20,
                 children: [
                   Icon(Icons.emoji_events, color: Colors.amber[600], size: 80),
-                  Text("Your High Score is ${currentUser.highScore},\ncongratulation", 
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                  Text(
+                    "Your High Score\nis currently ${currentUser.highScore},\ncongratulation",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
                 ],
               ),
 
@@ -85,7 +76,10 @@ class HomeScreenState extends State<HomeScreen> {
 
               GestureDetector(
                 onTap: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GameDisplayer()));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => GameDisplayer()),
+                  );
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -100,14 +94,14 @@ class HomeScreenState extends State<HomeScreen> {
                         Icon(
                           Icons.videogame_asset,
                           size: 35,
-                          color: Colors.amber[600],
+                          color: Theme.of(context).primaryColor,
                         ),
                         Text(
-                          "Quick Play",
+                          "QUICK PLAY",
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 28,
                             fontFamily: "PacFont",
-                            color: Colors.amber[600],
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ],
@@ -116,12 +110,42 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              Spacer(),
-              Spacer(),
-              Row(
-                children: [
-                ],
+              // Spacer(),
+
+              // ElevatedButton(
+              //   onPressed: () {
+              //     if (kDebugMode) {
+              //       print(currentUser);
+              //     }
+              //   },
+              //   child: Text(
+              //     "PRINT USER DATA",
+              //     style: TextStyle(
+              //       fontFamily: "PressStart",
+              //       fontSize: 20,
+              //       color: Colors.black
+              //     ),
+              //   ),
+              // ),
+
+              // Spacer(),
+
+              ElevatedButton(
+                onPressed: () async {
+                  final ref = FirebaseDatabase.instance.ref("users/${currentUser.uid}");
+                  currentUser.setData(ref);
+                }, 
+                child: Text(
+                  "SAVE USER DATA",
+                  style: TextStyle(
+                    fontFamily: "PressStart",
+                    fontSize: 20,
+                    color: Colors.black
+                  ),
+                ),
               ),
+              // Spacer(),
+              Spacer()
             ],
           ),
         ),

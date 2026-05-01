@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
 import 'package:pacman_application/game/game_manager.dart';
-import 'package:pacman_application/game/game_map.dart';
+import 'package:pacman_application/game/map/game_map.dart';
 import 'package:pacman_application/game/game_screen.dart';
 import 'package:pacman_application/game/pacman.dart';
 
@@ -24,10 +24,10 @@ abstract class AnimatedCharacter {
   late List<SpriteAnimation> animations = [];
   late SpriteAnimation currentAnimation;
 
-  Widget getSprite(double tileSize) => Positioned(
+  Widget getSprite(double tileSize, {Color? color}) => Positioned(
     left: x * tileSize,
     top: y * tileSize,
-    child: currentAnimation.getImage(),
+    child: currentAnimation.getImage(color: color),
   );
 
   void move(double dt);

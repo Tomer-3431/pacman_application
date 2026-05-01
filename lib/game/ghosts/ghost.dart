@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:pacman_application/game/animation/animated_character.dart';
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
-import 'package:pacman_application/game/game_map.dart';
+import 'package:pacman_application/game/map/game_map.dart';
 import 'package:pacman_application/util.dart';
 
 abstract class Ghost extends AnimatedCharacter {

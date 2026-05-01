@@ -1,14 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/util.dart';
+import 'package:pacman_application/utils/bonus_type.dart';
 
 class GameUser {
   final String uid;
-  String name = "Guest!";
-  int _highScore = 0;
+  String name = anonymousName;
+  int _highScore = anonymousHighScore;
   int get highScore => _highScore;
-  String email = "name@email.com";
+  String email = anonymousEmail;
+  Map<BonusType, int> bonusTable = anonymousBonusTable;
 
   set highScore(int score) {
     _highScore = score;
@@ -20,13 +23,24 @@ class GameUser {
     await ref.update({"highScore": score});
   }
 
+  void addBonus(BonusType bonus) {
+    bonusTable[bonus] = bonusTable[bonus]! + 1;
+    updateBonusTable(bonus);
+  }
+
+  void updateBonusTable(BonusType bonus) async {
+    final ref = FirebaseDatabase.instance.ref("users/$uid/bonusTable");
+    await ref.update({bonus.name: bonusTable[bonus]});
+  }
+
   GameUser({
     required this.uid,
-    this.name = "Guest!",
+    this.name = anonymousName,
     int? highScore,
-    this.email = "name@email.com",
+    this.email = anonymousEmail,
+    this.bonusTable = anonymousBonusTable,
   }) {
-    this.highScore = highScore ?? 0;
+    _highScore = highScore ?? anonymousHighScore;
   }
 
   GameUser.fromUid({required this.uid}) {
@@ -53,15 +67,49 @@ class GameUser {
   }
 
   bool haveInitalized() {
-    return name != "Guest!";
+    return name != anonymousName;
   }
 
   void setData(DatabaseReference ref) async {
     var event = await ref.child("name").once();
     name = tryCast(event.snapshot.value) ?? "";
     event = await ref.child("highScore").once();
-    highScore = tryCast(event.snapshot.value) ?? 0;
+    _highScore = tryCast(event.snapshot.value) ?? 0;
     event = await ref.child("email").once();
     email = tryCast(event.snapshot.value) ?? "";
+    bonusTable = <BonusType, int>{};
+    final entries = await Future.wait(
+      BonusType.values.map((bonus) {
+        return _getBonusDate(bonus, ref);
+      }),
+    );
+    bonusTable.addEntries(entries);
+  }
+
+  Future<MapEntry<BonusType, int>> _getBonusDate(
+    BonusType bonus,
+    DatabaseReference ref,
+  ) async {
+    var event = await ref.child("bonusTable").child(bonus.name).once();
+    return MapEntry(bonus, tryCast(event.snapshot.value) ?? 0);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) || (other is GameUser && uid == other.uid);
+  }
+
+  @override
+  int get hashCode => uid.hashCode;
+
+  @override
+  String toString() {
+    return """
+      uid: $uid
+      name: $name
+      high score: $highScore
+      email: $email
+      bonus table: $bonusTable
+    """;
   }
 }

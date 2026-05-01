@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/game_manager.dart';
 import 'package:pacman_application/game/pacman.dart';
 import 'package:pacman_application/util.dart';
@@ -54,5 +55,3 @@ class Bonus {
         : Container(),
   );
 }
-
-enum BonusType { apple, bell, cherry, galaxian, key, melon, orange, strawberry }

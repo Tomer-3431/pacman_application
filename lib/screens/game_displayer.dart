@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman_application/database/session.dart';
+import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/game_manager.dart';
-import 'package:pacman_application/home/home_screen.dart';
+import 'package:pacman_application/screens/home_screen.dart';
 
 class GameDisplayer extends StatefulWidget {
   const GameDisplayer({super.key});
@@ -23,13 +24,15 @@ class GameDisplayerState extends State<GameDisplayer> {
       highScore: () => currentUser.highScore,
       onGameOver: onGameOver,
       onRetry: onRetry,
-      onExit: onExit
+      onExit: onExit,
+      onGettingBonus: onGettingBonus
     );
     newGame = GameManager(
       highScore: () => currentUser.highScore,
       onGameOver: onGameOver,
       onRetry: onRetry,
-      onExit: onExit
+      onExit: onExit,
+      onGettingBonus: onGettingBonus
     );
     _gameManager.initGame();
   }
@@ -48,7 +51,8 @@ class GameDisplayerState extends State<GameDisplayer> {
         highScore: () => currentUser.highScore,
         onGameOver: onGameOver,
         onRetry: onRetry,
-        onExit: onExit
+        onExit: onExit,
+        onGettingBonus: onGettingBonus
       );
     });
   }
@@ -58,6 +62,10 @@ class GameDisplayerState extends State<GameDisplayer> {
       context,
       MaterialPageRoute(builder: (context) => HomeScreen()),
     );
+  }
+
+  void onGettingBonus(BonusType bonusType) {
+    currentUser.bonusTable[bonusType] = currentUser.bonusTable[bonusType]! + 1;
   }
 
   @override
