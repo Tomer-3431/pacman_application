@@ -1,4 +1,3 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman_application/constants.dart';
@@ -16,13 +15,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  double progress = 0.75;
+  double progress = 0;
 
   @override
   void initState() {
     super.initState();
 
-    // _getBonusProgress();
+    _getBonusProgress();
   }
 
   void _getBonusProgress() {
