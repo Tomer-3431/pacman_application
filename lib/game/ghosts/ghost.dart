@@ -1,5 +1,8 @@
 import 'dart:collection';
 import 'dart:math';
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:pacman_application/game/animation/animated_character.dart';
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
@@ -26,6 +29,8 @@ abstract class Ghost extends AnimatedCharacter {
   late SpriteAnimation frightened1;
 
   late SpriteAnimation idle;
+
+  SpriteAnimation? currentEyeAnimation;
 
   @override
   List<SpriteAnimation> get animations => [
@@ -104,10 +109,29 @@ abstract class Ghost extends AnimatedCharacter {
     );
 
     currentAnimation = idle;
+    currentEyeAnimation = eatenUp;
   }
 
   final void Function()? onDeath;
   final void Function()? onEaten;
+
+  @override
+  Widget getSprite(double tileSize, {Color? color}) => Positioned(
+    top: y * tileSize,
+    left: x * tileSize,
+    child: Stack(
+      children: [
+        currentAnimation.getImage(
+          color: state == GhostState.chase || state == GhostState.scatter
+              ? color
+              : null,
+        ),
+        color != null && currentEyeAnimation != null
+            ? currentEyeAnimation!.getImage()
+            : Container(),
+      ],
+    ),
+  );
 
   void updateState() {
     if (state == GhostState.eaten &&
@@ -315,8 +339,18 @@ abstract class Ghost extends AnimatedCharacter {
       GhostState.idle => idle,
     };
 
+    currentEyeAnimation = switch (state) {
+      GhostState.chase || GhostState.scatter => switch (currentDirection) {
+        Direction.up => eatenUp,
+        Direction.down => eatenDown,
+        Direction.left => eatenLeft,
+        Direction.right => eatenRight,
+      },
+      _ => null,
+    };
+
     for (var animation in animations) {
-      if (animation != currentAnimation) {
+      if (animation != currentAnimation && animation != currentEyeAnimation) {
         animation.idle();
       } else {
         animation.update(dt);

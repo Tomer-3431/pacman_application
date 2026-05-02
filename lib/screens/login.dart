@@ -8,7 +8,6 @@ import 'package:pacman_application/database/game_user.dart';
 import 'package:pacman_application/database/session.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/utils/appbar.dart';
-import 'package:pacman_application/screens/forgot_password.dart';
 import 'package:pacman_application/utils/loading_screen.dart';
 import 'package:pacman_application/screens/signup.dart';
 import 'package:pacman_application/screens/home_screen.dart';
@@ -338,20 +337,6 @@ class LoginState extends State<Login> {
                                 ),
                               ],
                             ),
-                    ),
-
-                    // ── Footer links ────────────────────────────────────
-                    GestureDetector(
-                      onTap: () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ForgotPassword(),
-                        ),
-                      ),
-                      child: Text(
-                        "Forgot Password?",
-                        style: TextStyle(color: Colors.grey),
-                      ),
                     ),
 
                     SizedBox(height: 10),

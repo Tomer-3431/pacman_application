@@ -27,7 +27,7 @@ class GameScreen extends StatefulWidget {
     required this.dt,
     required this.bonusesTaken,
     required this.retryButton,
-    required this.isGameOver
+    required this.isGameOver,
   });
 
   final Widget Function() gameMessege;
@@ -54,6 +54,11 @@ class _GameScreenState extends State<GameScreen> {
   double time = 0;
 
   Color? customPacmanColor;
+  Color? customBlinkyColor;
+  Color? customPinkyColor;
+  Color? customInkyColor;
+  Color? customClydeColor;
+  Color? customMapColor;
 
   @override
   void initState() {
@@ -73,16 +78,83 @@ class _GameScreenState extends State<GameScreen> {
   void getColors() async {
     final prefs = await SharedPreferences.getInstance();
 
-    final a = prefs.getInt("pacmanColor/a");
-    final r = prefs.getInt("pacmanColor/r");
-    final g = prefs.getInt("pacmanColor/g");
-    final b = prefs.getInt("pacmanColor/b");
+    var a = prefs.getInt("pacmanColor/a");
+    var r = prefs.getInt("pacmanColor/r");
+    var g = prefs.getInt("pacmanColor/g");
+    var b = prefs.getInt("pacmanColor/b");
 
     if (a == null || r == null || g == null || b == null) {
       return;
     }
 
     customPacmanColor = Color.fromARGB(a, r, g, b);
+
+    a = prefs.getInt("blinkyColor/a");
+    r = prefs.getInt("blinkyColor/r");
+    g = prefs.getInt("blinkyColor/g");
+    b = prefs.getInt("blinkyColor/b");
+
+    if (a == null || r == null || g == null || b == null) {
+      return;
+    }
+
+    customBlinkyColor = Color.fromARGB(a, r, g, b);
+
+    a = prefs.getInt("pinkyColor/a");
+    r = prefs.getInt("pinkyColor/r");
+    g = prefs.getInt("pinkyColor/g");
+    b = prefs.getInt("pinkyColor/b");
+
+    if (a == null || r == null || g == null || b == null) {
+      return;
+    }
+
+    customPinkyColor = Color.fromARGB(a, r, g, b);
+
+    a = prefs.getInt("inkyColor/a");
+    r = prefs.getInt("inkyColor/r");
+    g = prefs.getInt("inkyColor/g");
+    b = prefs.getInt("inkyColor/b");
+
+    if (a == null || r == null || g == null || b == null) {
+      return;
+    }
+
+    customInkyColor = Color.fromARGB(a, r, g, b);
+
+    a = prefs.getInt("clydeColor/a");
+    r = prefs.getInt("clydeColor/r");
+    g = prefs.getInt("clydeColor/g");
+    b = prefs.getInt("clydeColor/b");
+
+    if (a == null || r == null || g == null || b == null) {
+      return;
+    }
+
+    customClydeColor = Color.fromARGB(a, r, g, b);
+
+    a = prefs.getInt("mapColor/a");
+    r = prefs.getInt("mapColor/r");
+    g = prefs.getInt("mapColor/g");
+    b = prefs.getInt("mapColor/b");
+
+    if (a == null || r == null || g == null || b == null) {
+      return;
+    }
+
+    customMapColor = Color.fromARGB(a, r, g, b);
+
+    setState(() {});
+  }
+
+  Color? getColorByGhostName(String name) {
+    return switch (name) {
+      "Blinky" => customBlinkyColor,
+      "Pinky" => customPinkyColor,
+      "Inky" => customInkyColor,
+      "Clyde" => customClydeColor,
+      _ => null,
+    };
   }
 
   @override
@@ -122,6 +194,7 @@ class _GameScreenState extends State<GameScreen> {
                     width: mazeWidth,
                     height: mazeHeight,
                     fit: BoxFit.fill,
+                    color: customMapColor,
                   ),
                 ),
 
@@ -141,9 +214,17 @@ class _GameScreenState extends State<GameScreen> {
                 ...widget.gameMap.superPoints.map(
                   (superDot) => superDot.showOnStack(tileSize),
                 ),
-                ...widget.ghosts.map((ghost) => ghost.getSprite(tileSize)),
+                ...widget.ghosts.map(
+                  (ghost) => ghost.getSprite(
+                    tileSize,
+                    color: getColorByGhostName(ghost.name),
+                  ),
+                ),
                 widget.pacman.getSprite(tileSize, color: customPacmanColor),
-                widget.pacman.nextDirectionArrow(tileSize, color: customPacmanColor),
+                widget.pacman.nextDirectionArrow(
+                  tileSize,
+                  color: customPacmanColor,
+                ),
                 widget.bonus.getSprite(tileSize),
               ],
             ),
@@ -151,9 +232,7 @@ class _GameScreenState extends State<GameScreen> {
             buildBonusArea(widget.bonusesTaken),
 
             // const Spacer(),
-            widget.isGameOver()
-              ? widget.retryButton
-              : widget.controller,
+            widget.isGameOver() ? widget.retryButton : widget.controller,
           ],
         ),
       ),
@@ -173,11 +252,19 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               const Text(
                 "SCORE",
-                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 15),
+                style: TextStyle(
+                  fontFamily: "PressStart",
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
               ),
               Text(
                 widget.getScore().toString(),
-                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 20),
+                style: TextStyle(
+                  fontFamily: "PressStart",
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
               ),
             ],
           ),
@@ -186,11 +273,19 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               const Text(
                 "HIGH SCORE",
-                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 15),
+                style: TextStyle(
+                  fontFamily: "PressStart",
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
               ),
               Text(
                 widget.getHighScore().toString(),
-                style: TextStyle(fontFamily: "PressStart", color: Colors.white, fontSize: 20),
+                style: TextStyle(
+                  fontFamily: "PressStart",
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
               ),
             ],
           ),

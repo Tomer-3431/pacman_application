@@ -38,7 +38,7 @@ class GameDisplayerState extends State<GameDisplayer> {
   }
 
   void onGameOver(int score) {
-    if (score > currentUser.highScore) {
+    if (score > currentUser.highScore && !isAnonymous) {
       currentUser.highScore = score;
     }
   }
@@ -65,7 +65,9 @@ class GameDisplayerState extends State<GameDisplayer> {
   }
 
   void onGettingBonus(BonusType bonusType) {
-    currentUser.bonusTable[bonusType] = currentUser.bonusTable[bonusType]! + 1;
+    if (!isAnonymous) {
+      currentUser.bonusTable[bonusType] = currentUser.bonusTable[bonusType]! + 1;
+    }
   }
 
   @override

@@ -87,7 +87,7 @@ class SidebarState extends State<Sidebar> {
               spacing: 5,
               children: [
                 Icon(Icons.rule_sharp),
-                Text("Read the Rules"),
+                Text("Rules"),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -111,7 +111,7 @@ class SidebarState extends State<Sidebar> {
               spacing: 5,
               children: [
                 Icon(Icons.favorite_rounded),
-                Text("Explore the Credits"),
+                Text("Credits"),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -135,7 +135,7 @@ class SidebarState extends State<Sidebar> {
               spacing: 5,
               children: [
                 Icon(Icons.leaderboard),
-                Text("See the Leaderboard"),
+                Text("Leaderboard"),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -159,7 +159,7 @@ class SidebarState extends State<Sidebar> {
               spacing: 5,
               children: [
                 Icon(Icons.grid_view),
-                Text("Get the Collectable"),
+                Text("Collectable"),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -183,7 +183,7 @@ class SidebarState extends State<Sidebar> {
               spacing: 5,
               children: [
                 Icon(Icons.settings),
-                Text("Change the Settings"),
+                Text("Settings"),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,

@@ -155,8 +155,9 @@ class GameManager {
     "READY!",
     style: TextStyle(
       color: pacmanColor,
-      fontSize: 30,
+      fontSize: 25,
       fontWeight: FontWeight.bold,
+      fontFamily: "PressStart"
     ),
   );
 

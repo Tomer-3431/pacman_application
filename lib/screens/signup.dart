@@ -118,7 +118,7 @@ class SignupState extends State<Signup> {
             "key": 0,
             "melon": 0,
             "orange": 0,
-            "strawberry": 0
+            "strawberry": 0,
           },
         });
       }
@@ -274,7 +274,16 @@ class SignupState extends State<Signup> {
                       "name": nameController.text,
                       "email": emailController.text,
                       "highScore": anonymousHighScore,
-                      "bonusTable": anonymousBonusTable
+                      "bonusTable": {
+                        "apple": 0,
+                        "bell": 0,
+                        "cherry": 0,
+                        "galaxian": 0,
+                        "key": 0,
+                        "melon": 0,
+                        "orange": 0,
+                        "strawberry": 0,
+                      },
                     });
 
                     isAnonymous = false;
@@ -283,7 +292,7 @@ class SignupState extends State<Signup> {
                       name: nameController.text,
                       highScore: anonymousHighScore,
                       email: emailController.text,
-                      bonusTable: anonymousBonusTable
+                      bonusTable: anonymousBonusTable,
                     );
                     _savePrefs(currentUser);
 
@@ -292,6 +301,13 @@ class SignupState extends State<Signup> {
                       MaterialPageRoute(builder: (context) => Login()),
                     );
                   } on FirebaseAuthException catch (e) {
+                    if (kDebugMode) {
+                      print(e.code);
+                    }
+                    setState(() {
+                      messege = e.code;
+                    });
+                  } on FirebaseException catch (e) {
                     if (kDebugMode) {
                       print(e.code);
                     }

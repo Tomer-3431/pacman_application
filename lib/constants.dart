@@ -45,6 +45,11 @@ const List<List<int>> defaultMap = [
 ];
 
 const Color pacmanColor = Color(0xFFFFFF00);
+const Color blinkyColor = Color(0xFFFF0000);
+const Color pinkyColor = Color(0xFFFFB7FF);
+const Color inkyColor = Color(0xFF00FFFF);
+const Color clydeColor = Color(0xFFFFB751);
+const Color mapColor = Color(0xFF2121FF);
 
 const TextStyle headerTextStyle = TextStyle(
   fontFamily: "Pacfont",
