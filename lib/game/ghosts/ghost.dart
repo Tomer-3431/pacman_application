@@ -1,8 +1,6 @@
 import 'dart:collection';
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:pacman_application/game/animation/animated_character.dart';
 import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
