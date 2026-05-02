@@ -72,7 +72,7 @@ class GameDisplayerState extends State<GameDisplayer> {
 
   void onGettingBonus(BonusType bonusType) {
     if (!isAnonymous) {
-      currentUser.bonusTable[bonusType] = currentUser.bonusTable[bonusType]! + 1;
+      currentUser.addBonus(bonusType);
     }
   }
 
