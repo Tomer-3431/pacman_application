@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/game/bonus.dart';
@@ -80,7 +81,7 @@ class GameManager {
   );
 
   late GameScreen currentScreen = GameScreen(
-    gameMessege: () => gameMessege,
+    gameMessege: (x) => gameMessege(x),
     topText: () {
       return ghosts.first.state.name;
     },
@@ -98,14 +99,22 @@ class GameManager {
     retryButton: retryButton,
   );
 
-  late RetryButton retryButton = RetryButton(size: 120, onRetry: onRetry, onExit: onExit,);
+  late RetryButton retryButton = RetryButton(
+    size: 120,
+    onRetry: onRetry,
+    onExit: onExit,
+  );
 
   bool paused = false;
 
   void onDeath() {
     paused = true;
 
+    _audioPlayer.setReleaseMode(ReleaseMode.release);
+    _audioPlayer.play(AssetSource("audio/Fail.mp3"));
+    _currentAudioState = AudioState.idle;
     pacman.playDeath();
+
     Timer(Duration(seconds: 3), () {
       paused = false;
       for (var ghost in ghosts) {
@@ -117,18 +126,27 @@ class GameManager {
       if (lives <= 0) {
         isGameOver = true;
 
-        gameMessege = Text(
-          "GAME OVER!",
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+        gameMessege = (double tileSize) => Positioned(
+          top: tileSize * 16.3,
+          left: tileSize * 9.3,
+          child: Center(
+            child: Text(
+              "GAME OVER",
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: "PressStart"
+              ),
+            ),
           ),
         );
         for (var ghost in ghosts) {
           ghost.state = GhostState.idle;
         }
         periodicTimer.cancel();
+        _audioPlayer.stop();
+        _audioPlayer.dispose();
         onGameOver.call(score);
       }
     });
@@ -151,13 +169,19 @@ class GameManager {
   ];
 
   int lives = 3;
-  Widget gameMessege = Text(
-    "READY!",
-    style: TextStyle(
-      color: pacmanColor,
-      fontSize: 25,
-      fontWeight: FontWeight.bold,
-      fontFamily: "PressStart"
+  Widget Function(double tileSize) gameMessege = (double tileSize) => Positioned(
+    top: 16.2 * tileSize,
+    left: 10.5 * tileSize,
+    child: Center(
+      child: Text(
+        "READY!",
+        style: TextStyle(
+          color: pacmanColor,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          fontFamily: "PressStart",
+        ),
+      ),
     ),
   );
 
@@ -189,13 +213,15 @@ class GameManager {
   late void Function() onExit;
   late void Function(BonusType) onGettingBonus;
 
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
   GameManager({
     bool start = false,
     int Function()? highScore,
     void Function(int score)? onGameOver,
     void Function()? onRetry,
     void Function()? onExit,
-    void Function(BonusType bonus)? onGettingBonus
+    void Function(BonusType bonus)? onGettingBonus,
   }) {
     if (onGameOver != null) {
       this.onGameOver = onGameOver;
@@ -219,7 +245,7 @@ class GameManager {
     } else {
       this.onExit = () {};
     }
-    
+
     if (onGettingBonus != null) {
       this.onGettingBonus = onGettingBonus;
     } else {
@@ -230,9 +256,10 @@ class GameManager {
   }
 
   void initGame() {
+    _audioPlayer.play(AssetSource("audio/Start_Music.mp3"));
     highScore = getHighScoreFromDisplayer?.call() ?? highScore;
-    Timer(Duration(seconds: 3), () {
-      gameMessege = Container();
+    Timer(Duration(seconds: 5), () {
+      gameMessege = (x) => Container();
       bonusTimer.start();
       stopwatch.start();
       periodicTimer = Timer.periodic(
@@ -281,8 +308,43 @@ class GameManager {
       highScore = score;
     }
 
+    final lastCurrentAudioState = _currentAudioState;
+    _currentAudioState = AudioState.normal;
     for (var ghost in ghosts) {
       ghost.update(dt);
+
+      switch (ghost.state) {
+        case GhostState.chase || GhostState.scatter:
+          break;
+        case GhostState.frightened0 || GhostState.frightened1:
+          if (_currentAudioState == AudioState.normal) {
+            _currentAudioState = AudioState.blue;
+          }
+          break;
+        case GhostState.eaten:
+          _currentAudioState = AudioState.eye;
+          break;
+        case GhostState.idle:
+          break;
+      }
+    }
+
+    _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    if (_currentAudioState != lastCurrentAudioState) {
+      switch (_currentAudioState) {
+        case AudioState.idle:
+          // _audioPlayer.stop();
+          break;
+        case AudioState.normal:
+          _audioPlayer.play(AssetSource("audio/Pacman_Eating_Dots.mp3"));
+          break;
+        case AudioState.blue:
+          _audioPlayer.play(AssetSource("audio/Ghost_Turn_To_Blue.mp3"));
+          break;
+        case AudioState.eye:
+          _audioPlayer.play(AssetSource("audio/Ghost_Return_To_Home.mp3"));
+          break;
+      }
     }
 
     if (!hasUpdatedNextScreen && gameMap.leftDots == 0) {
@@ -303,4 +365,8 @@ class GameManager {
       });
     }
   }
+
+  AudioState _currentAudioState = AudioState.idle;
 }
+
+enum AudioState { idle, normal, blue, eye }

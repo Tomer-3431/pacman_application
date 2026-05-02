@@ -4,14 +4,14 @@ import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
 
-class Credit extends StatefulWidget {
-  const Credit({super.key});
+class ReadMe extends StatefulWidget {
+  const ReadMe({super.key});
 
   @override
-  State<StatefulWidget> createState() => CreditState();
+  State<StatefulWidget> createState() => ReadMeState();
 }
 
-class CreditState extends State<Credit> {
+class ReadMeState extends State<ReadMe> {
   @override
   void dispose() {
     super.dispose();
@@ -27,7 +27,7 @@ class CreditState extends State<Credit> {
     appBar: Appbar(
       context: context,
       header: Text(
-        "CREDIT SCREEN",
+        "READ ME",
         style: headerTextStyle,
       ),
     ),
@@ -35,7 +35,7 @@ class CreditState extends State<Credit> {
     body: SafeArea(
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-        child: Center(child: Text("PLACEHOLDER for credits")),
+        child: Center(child: Text("PLACEHOLDER for Read Me")),
       ),
     ),
   );

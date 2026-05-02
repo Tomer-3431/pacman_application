@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman_application/constants.dart';
@@ -17,10 +18,15 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   double progress = 0;
 
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
   @override
   void initState() {
     super.initState();
 
+    _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    _audioPlayer.play(AssetSource("audio/Home_Music.mp3"));
+  
     _getBonusProgress();
   }
 

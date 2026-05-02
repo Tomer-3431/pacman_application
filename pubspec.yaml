@@ -44,6 +44,7 @@ dependencies:
   shared_preferences: ^2.5.5
   flutter_colorpicker: ^1.1.0
   google_fonts: ^8.1.0
+  just_audio: ^0.10.5
 
 dev_dependencies:
   flutter_test:
@@ -92,6 +93,7 @@ flutter:
     - assets/audio/Spurt_Move_3.mp3
     - assets/audio/Spurt_Move_4.mp3
     - assets/audio/Start_Music.mp3
+    - assets/audio/Home_Music.mp3
 
     - assets/game/map/map.png
     - assets/game/pacman.png

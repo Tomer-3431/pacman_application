@@ -314,6 +314,9 @@ abstract class Ghost extends AnimatedCharacter {
       case GhostState.idle:
         break;
     }
+
+    x = x.clamp(0, getGameMap().kCols - 1);
+    y = y.clamp(0, getGameMap().kRows - 1);
   }
 
   @override

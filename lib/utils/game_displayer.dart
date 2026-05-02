@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman_application/database/session.dart';
@@ -16,9 +17,14 @@ class GameDisplayerState extends State<GameDisplayer> {
   late GameManager _gameManager;
   late GameManager newGame;
 
+  final AudioPlayer audioPlayer = AudioPlayer();
+
   @override
   void initState() {
     super.initState();
+    
+    audioPlayer.setReleaseMode(ReleaseMode.loop);
+    audioPlayer.stop();
 
     _gameManager = GameManager(
       highScore: () => currentUser.highScore,

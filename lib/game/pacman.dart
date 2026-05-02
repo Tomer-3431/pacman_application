@@ -144,8 +144,8 @@ class Pacman extends AnimatedCharacter {
         break;
     }
 
-    x = x.clamp(0, getGameMap().kCols).toDouble();
-    y = y.clamp(0, getGameMap().kRows).toDouble();
+    x = x.clamp(0, getGameMap().kCols - 1).toDouble();
+    y = y.clamp(0, getGameMap().kRows - 1).toDouble();
 
     if (getGameMap().map[y.round()][x.round()] == GameMap.kTunnel) {
       if (x < 1) {

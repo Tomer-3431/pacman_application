@@ -30,7 +30,7 @@ class GameScreen extends StatefulWidget {
     required this.isGameOver,
   });
 
-  final Widget Function() gameMessege;
+  final Widget Function(double tileSize) gameMessege;
   final String Function() topText;
   final Controller controller;
   final RetryButton retryButton;
@@ -204,11 +204,8 @@ class _GameScreenState extends State<GameScreen> {
                 //     size: Size(mazeWidth, mazeHeight),
                 //   ),
                 // ),
-                Positioned(
-                  top: tileSize * 16.2,
-                  left: tileSize * 10.5,
-                  child: widget.gameMessege(),
-                ),
+
+                widget.gameMessege(tileSize),
 
                 ...widget.gameMap.dots.map((dot) => dot.showOnStack(tileSize)),
                 ...widget.gameMap.superPoints.map(

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pacman_application/database/session.dart';
-import 'package:pacman_application/screens/credit.dart';
+import 'package:pacman_application/screens/read_me.dart';
 import 'package:pacman_application/screens/collectables_screen.dart';
 import 'package:pacman_application/utils/game_displayer.dart';
 import 'package:pacman_application/screens/home_screen.dart';
 import 'package:pacman_application/screens/leaderboard.dart';
-import 'package:pacman_application/screens/rules.dart';
 import 'package:pacman_application/screens/settings.dart';
 
 class Sidebar extends StatefulWidget {
@@ -79,31 +78,7 @@ class SidebarState extends State<Sidebar> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (final BuildContext context) => Rules(),
-                ),
-              );
-            },
-            child: Row(
-              spacing: 5,
-              children: [
-                Icon(Icons.rule_sharp),
-                Text("Rules"),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [Icon(Icons.arrow_forward_ios)],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          GestureDetector(
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (final BuildContext context) => Credit(),
+                  builder: (final BuildContext context) => ReadMe(),
                 ),
               );
             },
@@ -111,7 +86,7 @@ class SidebarState extends State<Sidebar> {
               spacing: 5,
               children: [
                 Icon(Icons.favorite_rounded),
-                Text("Credits"),
+                Text("Read Me"),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
