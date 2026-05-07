@@ -31,7 +31,7 @@ class SpriteAnimation {
   bool done = false;
   bool started = false;
 
-  double frameSpeed;
+  final double frameSpeed;
 
   Image getImage({Color? color}) {
     return Image.asset(path[currentIndex], color: color,);

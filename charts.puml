@@ -1,0 +1,782 @@
+@startuml
+set namespaceSeparator ::
+
+class "pacman_application::database::firebase_options.dart::DefaultFirebaseOptions" {
+  {static} +FirebaseOptions web
+  {static} +FirebaseOptions android
+  {static} +FirebaseOptions ios
+  {static} +FirebaseOptions macos
+  {static} +FirebaseOptions windows
+  {static} +FirebaseOptions currentPlatform
+}
+
+"pacman_application::database::firebase_options.dart::DefaultFirebaseOptions" o-- "firebase_core_platform_interface::firebase_core_platform_interface.dart::FirebaseOptions"
+
+class "pacman_application::database::game_user.dart::GameUser" {
+  +String uid
+  +String name
+  -int _highScore
+  +String email
+  +Map<BonusType, int> bonusTable
+  +int highScore
+  +int hashCode
+  +void updateScore()
+  +void addBonus()
+  +void updateBonusTable()
+  +bool haveInitalized()
+  +void setData()
+  -dynamic _getBonusDate()
+  +bool ==()
+  +String toString()
+}
+
+abstract class "pacman_application::game::animation::animated_character.dart::AnimatedCharacter" {
+  +GameManager gameManager
+  +String name
+  +double x
+  +double y
+  +Direction currentDirection
+  +Direction nextDirection
+  +List<SpriteAnimation> animations
+  +SpriteAnimation currentAnimation
+  +Widget getSprite()
+  +void move()
+  +void updateAnimation()
+  +void update()
+  +GameMap getGameMap()
+  +GameScreen getGameScreen()
+  +Pacman getPacman()
+  +void reset()
+}
+
+"pacman_application::game::animation::animated_character.dart::AnimatedCharacter" o-- "pacman_application::game::game_manager.dart::GameManager"
+"pacman_application::game::animation::animated_character.dart::AnimatedCharacter" o-- "pacman_application::game::direction.dart::Direction"
+"pacman_application::game::animation::animated_character.dart::AnimatedCharacter" o-- "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation"
+
+class "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation" {
+  +String characterName
+  +String animationName
+  +List<String> path
+  +int spritesAmount
+  +double clock
+  +double elapsed
+  +int currentIndex
+  +bool isLoop
+  +bool paused
+  +bool done
+  +bool started
+  +double frameSpeed
+  +Image getImage()
+  +void update()
+  +void idle()
+}
+
+class "pacman_application::game::bonus.dart::Bonus" {
+  +String name
+  +bool isVisiable
+  +BonusType currentType
+  +Random random
+  +GameManager gameManager
+  +double x
+  +double y
+  +void Function(BonusType)? onEaten
+  {static} +String bonusAssetsPath
+  {static} +String bonusesAssetsEndFile
+  +Pacman getPacman()
+  +void update()
+  +void setVisiable()
+  +Widget getSprite()
+}
+
+"pacman_application::game::bonus.dart::Bonus" o-- "pacman_application::utils::bonus_type.dart::BonusType"
+"pacman_application::game::bonus.dart::Bonus" o-- "dart::math::Random"
+"pacman_application::game::bonus.dart::Bonus" o-- "pacman_application::game::game_manager.dart::GameManager"
+"pacman_application::game::bonus.dart::Bonus" o-- "null::void Function(BonusType)"
+
+class "pacman_application::game::controller::controller.dart::Controller" {
+  +void Function(Direction) onDirectionChanged
+  +State<Controller> createState()
+}
+
+"pacman_application::game::controller::controller.dart::Controller" o-- "null::void Function(Direction)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::game::controller::controller.dart::Controller"
+
+class "pacman_application::game::controller::controller.dart::_ControllerState" {
+  +Widget build()
+  +Widget dpad()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::game::controller::controller.dart::_ControllerState"
+
+class "pacman_application::game::controller::dpad_button.dart::DpadButton" {
+  +double size
+  +IconData icon
+  +void Function() onPressed
+  +State<DpadButton> createState()
+}
+
+"pacman_application::game::controller::dpad_button.dart::DpadButton" o-- "flutter::src::widgets::icon_data.dart::IconData"
+"pacman_application::game::controller::dpad_button.dart::DpadButton" o-- "dart::ui::void Function()"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::game::controller::dpad_button.dart::DpadButton"
+
+class "pacman_application::game::controller::dpad_button.dart::DpadButtonState" {
+  -bool _isPressed
+  -Timer? _repeatTimer
+  -void _startPress()
+  -void _endPress()
+  +void dispose()
+  +Widget build()
+}
+
+"pacman_application::game::controller::dpad_button.dart::DpadButtonState" o-- "dart::async::Timer"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::game::controller::dpad_button.dart::DpadButtonState"
+
+class "pacman_application::game::controller::retry_button.dart::RetryButton" {
+  +double size
+  +void Function() onRetry
+  +void Function() onExit
+  +State<StatefulWidget> createState()
+}
+
+"pacman_application::game::controller::retry_button.dart::RetryButton" o-- "dart::ui::void Function()"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::game::controller::retry_button.dart::RetryButton"
+
+class "pacman_application::game::controller::retry_button.dart::RetryButtonState" {
+  -bool _isRetryPressed
+  -bool _isExitPressed
+  -void _startRetryPress()
+  -void _endRetryPress()
+  -void _startExitPress()
+  -void _endExitPress()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::game::controller::retry_button.dart::RetryButtonState"
+
+class "pacman_application::game::direction.dart::Direction" {
+  +int index
+  {static} +List<Direction> values
+  {static} +Direction up
+  {static} +Direction down
+  {static} +Direction left
+  {static} +Direction right
+}
+
+"pacman_application::game::direction.dart::Direction" o-- "pacman_application::game::direction.dart::Direction"
+"dart::core::Enum" <|-- "pacman_application::game::direction.dart::Direction"
+
+class "pacman_application::game::dot.dart::Dot" {
+  +int x
+  +int y
+  +bool isEaten
+  +void Function() onEaten
+  +Widget build()
+  +Widget showOnStack()
+  +void checkIfEaten()
+  +void eat()
+  +void reset()
+}
+
+"pacman_application::game::dot.dart::Dot" o-- "null::void Function()"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pacman_application::game::dot.dart::Dot"
+
+class "pacman_application::game::game_manager.dart::GameManager" {
+  +int score
+  +int highScore
+  +int screenNum
+  +int currentGhostEatenScore
+  +int nextGhostEatenScore
+  +List<GameTimer> gameTimers
+  +GameMap gameMap
+  +Pacman pacman
+  +bool isGameOver
+  +Controller controller
+  +GameScreen currentScreen
+  +RetryButton retryButton
+  +bool paused
+  +List<Ghost> ghosts
+  +int lives
+  +Widget Function(double) gameMessege
+  +double dt
+  +Timer periodicTimer
+  +Stopwatch stopwatch
+  +double lastTime
+  +List<BonusType> bonusesTaken
+  +Bonus bonus
+  +GameTimer bonusTimer
+  +void Function(int) onGameOver
+  +void Function() onRetry
+  +int Function()? getHighScoreFromDisplayer
+  +void Function() onExit
+  +void Function(BonusType) onGettingBonus
+  -AudioPlayer _audioPlayer
+  +bool hasUpdatedNextScreen
+  -AudioState _currentAudioState
+  +void onDeath()
+  +void onEaten()
+  +void onBonus()
+  +void initGame()
+  +void update()
+}
+
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::map::game_map.dart::GameMap"
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::pacman.dart::Pacman"
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::controller::controller.dart::Controller"
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::game_screen.dart::GameScreen"
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::controller::retry_button.dart::RetryButton"
+"pacman_application::game::game_manager.dart::GameManager" o-- "null::Widget Function(double)"
+"pacman_application::game::game_manager.dart::GameManager" o-- "dart::async::Timer"
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::bonus.dart::Bonus"
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::game_timer.dart::GameTimer"
+"pacman_application::game::game_manager.dart::GameManager" o-- "null::void Function(int)"
+"pacman_application::game::game_manager.dart::GameManager" o-- "null::void Function()"
+"pacman_application::game::game_manager.dart::GameManager" o-- "null::int Function()"
+"pacman_application::game::game_manager.dart::GameManager" o-- "null::void Function(BonusType)"
+"pacman_application::game::game_manager.dart::GameManager" o-- "audioplayers::src::audioplayer.dart::AudioPlayer"
+"pacman_application::game::game_manager.dart::GameManager" o-- "pacman_application::game::game_manager.dart::AudioState"
+
+class "pacman_application::game::game_manager.dart::AudioState" {
+  +int index
+  {static} +List<AudioState> values
+  {static} +AudioState idle
+  {static} +AudioState normal
+  {static} +AudioState blue
+  {static} +AudioState eye
+}
+
+"pacman_application::game::game_manager.dart::AudioState" o-- "pacman_application::game::game_manager.dart::AudioState"
+"dart::core::Enum" <|-- "pacman_application::game::game_manager.dart::AudioState"
+
+class "pacman_application::game::game_screen.dart::GameScreen" {
+  +Widget Function(double) gameMessege
+  +String Function() topText
+  +Controller controller
+  +RetryButton retryButton
+  +bool Function() isGameOver
+  +Pacman pacman
+  +List<Ghost> ghosts
+  +Bonus bonus
+  +List<BonusType> bonusesTaken
+  +GameMap gameMap
+  +int Function() getScore
+  +int Function() getLives
+  +int Function() getHighScore
+  +double dt
+  +State<GameScreen> createState()
+}
+
+"pacman_application::game::game_screen.dart::GameScreen" o-- "null::Widget Function(double)"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "null::String Function()"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "pacman_application::game::controller::controller.dart::Controller"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "pacman_application::game::controller::retry_button.dart::RetryButton"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "null::bool Function()"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "pacman_application::game::pacman.dart::Pacman"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "pacman_application::game::bonus.dart::Bonus"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "pacman_application::game::map::game_map.dart::GameMap"
+"pacman_application::game::game_screen.dart::GameScreen" o-- "null::int Function()"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::game::game_screen.dart::GameScreen"
+
+class "pacman_application::game::game_screen.dart::_GameScreenState" {
+  -Timer? _timer
+  +double time
+  +Color? customPacmanColor
+  +Color? customBlinkyColor
+  +Color? customPinkyColor
+  +Color? customInkyColor
+  +Color? customClydeColor
+  +Color? customMapColor
+  +void initState()
+  +void getColors()
+  +Color? getColorByGhostName()
+  +void dispose()
+  +Widget build()
+  +Widget buildHUD()
+  +Widget buildLives()
+  +Widget buildBonusArea()
+}
+
+"pacman_application::game::game_screen.dart::_GameScreenState" o-- "dart::async::Timer"
+"pacman_application::game::game_screen.dart::_GameScreenState" o-- "dart::ui::Color"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::game::game_screen.dart::_GameScreenState"
+
+class "pacman_application::game::game_timer.dart::GameTimer" {
+  +void Function()? onEnd
+  +double timer
+  +double clock
+  +bool isOn
+  +bool isLoop
+  +void update()
+  +void start()
+  +void pause()
+  +void reset()
+}
+
+"pacman_application::game::game_timer.dart::GameTimer" o-- "null::void Function()"
+
+class "pacman_application::game::ghosts::blinky.dart::Blinky" {
+  +String name
+  +Direction currentDirection
+  +Direction nextDirection
+  +double x
+  +double y
+  +dynamic startingPosition
+  +dynamic scatterLocation
+  +SpriteAnimation idle
+  +void chase()
+  +dynamic late()
+}
+
+"pacman_application::game::ghosts::blinky.dart::Blinky" o-- "pacman_application::game::direction.dart::Direction"
+"pacman_application::game::ghosts::blinky.dart::Blinky" o-- "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation"
+"pacman_application::game::ghosts::ghost.dart::Ghost" <|-- "pacman_application::game::ghosts::blinky.dart::Blinky"
+
+class "pacman_application::game::ghosts::clyde.dart::Clyde" {
+  +String name
+  +Direction currentDirection
+  +Direction nextDirection
+  +double x
+  +double y
+  +dynamic startingPosition
+  +dynamic scatterLocation
+  +SpriteAnimation idle
+  +void chase()
+  +dynamic late()
+}
+
+"pacman_application::game::ghosts::clyde.dart::Clyde" o-- "pacman_application::game::direction.dart::Direction"
+"pacman_application::game::ghosts::clyde.dart::Clyde" o-- "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation"
+"pacman_application::game::ghosts::ghost.dart::Ghost" <|-- "pacman_application::game::ghosts::clyde.dart::Clyde"
+
+abstract class "pacman_application::game::ghosts::ghost.dart::Ghost" {
+  +GhostState state
+  +dynamic scatterLocation
+  +bool hasStartedFrightenedMode
+  +Random random
+  +double speed
+  +dynamic startingPosition
+  +SpriteAnimation up
+  +SpriteAnimation right
+  +SpriteAnimation down
+  +SpriteAnimation left
+  +SpriteAnimation eatenUp
+  +SpriteAnimation eatenRight
+  +SpriteAnimation eatenDown
+  +SpriteAnimation eatenLeft
+  +SpriteAnimation frightened0
+  +SpriteAnimation frightened1
+  +SpriteAnimation idle
+  +SpriteAnimation? currentEyeAnimation
+  +void Function()? onDeath
+  +void Function()? onEaten
+  +List<SpriteAnimation> animations
+  +dynamic abstract()
+  +dynamic abstract()
+  +Widget getSprite()
+  +void updateState()
+  +void reset()
+  +void chase()
+  +void scatter()
+  +void frightened()
+  +void eaten()
+  +void move()
+  +void updateAnimation()
+  +void update()
+}
+
+"pacman_application::game::ghosts::ghost.dart::Ghost" o-- "pacman_application::game::ghosts::ghost.dart::GhostState"
+"pacman_application::game::ghosts::ghost.dart::Ghost" o-- "dart::math::Random"
+"pacman_application::game::ghosts::ghost.dart::Ghost" o-- "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation"
+"pacman_application::game::ghosts::ghost.dart::Ghost" o-- "null::void Function()"
+"pacman_application::game::animation::animated_character.dart::AnimatedCharacter" <|-- "pacman_application::game::ghosts::ghost.dart::Ghost"
+
+class "pacman_application::game::ghosts::ghost.dart::GhostState" {
+  +int index
+  {static} +List<GhostState> values
+  {static} +GhostState chase
+  {static} +GhostState scatter
+  {static} +GhostState frightened0
+  {static} +GhostState frightened1
+  {static} +GhostState eaten
+  {static} +GhostState idle
+}
+
+"pacman_application::game::ghosts::ghost.dart::GhostState" o-- "pacman_application::game::ghosts::ghost.dart::GhostState"
+"dart::core::Enum" <|-- "pacman_application::game::ghosts::ghost.dart::GhostState"
+
+class "pacman_application::game::ghosts::inky.dart::Inky" {
+  +String name
+  +Direction currentDirection
+  +Direction nextDirection
+  +double x
+  +double y
+  +dynamic startingPosition
+  {static} +double blinkyLocation
+  +dynamic scatterLocation
+  +SpriteAnimation idle
+  +void chase()
+  {static} +void setBlinkyLocation()
+  +dynamic late()
+}
+
+"pacman_application::game::ghosts::inky.dart::Inky" o-- "pacman_application::game::direction.dart::Direction"
+"pacman_application::game::ghosts::inky.dart::Inky" o-- "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation"
+"pacman_application::game::ghosts::ghost.dart::Ghost" <|-- "pacman_application::game::ghosts::inky.dart::Inky"
+
+class "pacman_application::game::ghosts::pinky.dart::Pinky" {
+  +String name
+  +Direction currentDirection
+  +Direction nextDirection
+  +double x
+  +double y
+  +dynamic startingPosition
+  +dynamic scatterLocation
+  +SpriteAnimation idle
+  +void chase()
+}
+
+"pacman_application::game::ghosts::pinky.dart::Pinky" o-- "pacman_application::game::direction.dart::Direction"
+"pacman_application::game::ghosts::pinky.dart::Pinky" o-- "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation"
+"pacman_application::game::ghosts::ghost.dart::Ghost" <|-- "pacman_application::game::ghosts::pinky.dart::Pinky"
+
+class "pacman_application::game::map::game_map.dart::GameMap" {
+  +List<List<int>> map
+  {static} +int kEmpty
+  {static} +int kWall
+  {static} +int kSmallDot
+  {static} +int kSuperDot
+  {static} +int kBonus
+  {static} +int kTunnel
+  {static} +int kGhostHouseDoor
+  {static} +int kGhostHouseInterior
+  {static} +int kStartingPosition
+  +String mapAssetPath
+  +int kCols
+  +int kRows
+  +double startingCol
+  +double startingRow
+  +int ghostHouseX
+  +int ghostHouseY
+  +double bonusX
+  +double bonusY
+  +List<Dot> dots
+  +List<SuperDot> superPoints
+  +void Function() onDotEaten
+  +void Function() onSuperDotEaten
+  +int leftDots
+  +void init()
+  +void reset()
+  +bool isWall()
+}
+
+"pacman_application::game::map::game_map.dart::GameMap" o-- "null::void Function()"
+
+class "pacman_application::game::map::map_paller.dart::MapPallet" {
+  +GameMap gameMap
+  +Widget build()
+}
+
+"pacman_application::game::map::map_paller.dart::MapPallet" o-- "pacman_application::game::map::game_map.dart::GameMap"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pacman_application::game::map::map_paller.dart::MapPallet"
+
+class "pacman_application::game::map::maze_painter.dart::MazePainter" {
+  +GameMap gameMap
+  +void paint()
+  +bool shouldRepaint()
+}
+
+"pacman_application::game::map::maze_painter.dart::MazePainter" o-- "pacman_application::game::map::game_map.dart::GameMap"
+"flutter::src::rendering::custom_paint.dart::CustomPainter" <|-- "pacman_application::game::map::maze_painter.dart::MazePainter"
+
+class "pacman_application::game::pacman.dart::Pacman" {
+  +String name
+  +Direction currentDirection
+  +Direction nextDirection
+  +double x
+  +double y
+  +double speed
+  +double acceleration
+  +double jerk
+  +double maxSpeed
+  +double maxAcceleration
+  +double startSpeed
+  +SpriteAnimation deathAnimation
+  +SpriteAnimation idleAnimation
+  +SpriteAnimation upAnimation
+  +SpriteAnimation rightAnimation
+  +SpriteAnimation downAnimation
+  +SpriteAnimation leftAnimation
+  +List<SpriteAnimation> animations
+  +void updateAnimation()
+  +void move()
+  +void reset()
+  +Widget nextDirectionArrow()
+  +void playDeath()
+  +void updateDeathAnimation()
+}
+
+"pacman_application::game::pacman.dart::Pacman" o-- "pacman_application::game::direction.dart::Direction"
+"pacman_application::game::pacman.dart::Pacman" o-- "pacman_application::game::animation::sprite_animation.dart::SpriteAnimation"
+"pacman_application::game::animation::animated_character.dart::AnimatedCharacter" <|-- "pacman_application::game::pacman.dart::Pacman"
+
+class "pacman_application::game::super_dot.dart::SuperDot" {
+  +int x
+  +int y
+  +bool isEaten
+  +void Function() onEaten
+  +Widget build()
+  +Widget showOnStack()
+  +void checkIfEaten()
+  +void eat()
+  +void reset()
+}
+
+"pacman_application::game::super_dot.dart::SuperDot" o-- "null::void Function()"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pacman_application::game::super_dot.dart::SuperDot"
+
+class "pacman_application::main.dart::MyApp" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pacman_application::main.dart::MyApp"
+
+class "pacman_application::screens::collectables_screen.dart::CollectablesScreen" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::screens::collectables_screen.dart::CollectablesScreen"
+
+class "pacman_application::screens::collectables_screen.dart::CollectablesScreenState" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::screens::collectables_screen.dart::CollectablesScreenState"
+
+class "pacman_application::screens::home_screen.dart::HomeScreen" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::screens::home_screen.dart::HomeScreen"
+
+class "pacman_application::screens::home_screen.dart::HomeScreenState" {
+  +double progress
+  -AudioPlayer _audioPlayer
+  +void initState()
+  -void _getBonusProgress()
+  +void dispose()
+  +Widget build()
+}
+
+"pacman_application::screens::home_screen.dart::HomeScreenState" o-- "audioplayers::src::audioplayer.dart::AudioPlayer"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::screens::home_screen.dart::HomeScreenState"
+
+class "pacman_application::screens::leaderboard.dart::Leaderboard" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::screens::leaderboard.dart::Leaderboard"
+
+class "pacman_application::screens::leaderboard.dart::LeaderboardState" {
+  +List<GameUser> users
+  +void initState()
+  +void getUsers()
+  +void dispose()
+  +Widget build()
+  -Widget _getRankBadge()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::screens::leaderboard.dart::LeaderboardState"
+
+class "pacman_application::screens::login.dart::Login" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::screens::login.dart::Login"
+
+class "pacman_application::screens::login.dart::LoginState" {
+  +TextEditingController emailController
+  +TextEditingController passwordController
+  -bool _googleLoading
+  +void initState()
+  +void dispose()
+  -void _checkPrefs()
+  -dynamic _bonusTablePrefs()
+  -void _savePrefs()
+  -void _removePrefs()
+  -void _signInWithGoogle()
+  +Widget build()
+}
+
+"pacman_application::screens::login.dart::LoginState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::screens::login.dart::LoginState"
+
+class "pacman_application::screens::read_me.dart::ReadMe" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::screens::read_me.dart::ReadMe"
+
+class "pacman_application::screens::read_me.dart::ReadMeState" {
+  +void dispose()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::screens::read_me.dart::ReadMeState"
+
+class "pacman_application::screens::settings.dart::Settings" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::screens::settings.dart::Settings"
+
+class "pacman_application::screens::settings.dart::SettingsState" {
+  +Color pacmanPickedColor
+  +Color blinkyPickedColor
+  +Color pinkyPickedColor
+  +Color inkyPickedColor
+  +Color clydePickedColor
+  +Color mapPickedColor
+  +void initState()
+  +void getColor()
+  +int floatToInt8()
+  +Color getChracterColor()
+  +void saveColor()
+  +void dispose()
+  +void colorDialog()
+  +void resetPacmanColor()
+  +void resetBlinkyColor()
+  +void resetPinkyColor()
+  +void resetInkyColor()
+  +void resetClydeColor()
+  +void resetMapColor()
+  +void resetColor()
+  +Widget pickedColorWidget()
+  +Widget build()
+}
+
+"pacman_application::screens::settings.dart::SettingsState" o-- "dart::ui::Color"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::screens::settings.dart::SettingsState"
+
+class "pacman_application::screens::signup.dart::Signup" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::screens::signup.dart::Signup"
+
+class "pacman_application::screens::signup.dart::SignupState" {
+  +bool tosValue
+  -bool _googleLoading
+  +TextEditingController nameController
+  +TextEditingController emailController
+  +TextEditingController passwordController
+  +String messege
+  +void dispose()
+  -void _savePrefs()
+  +dynamic getIsNewUser()
+  -void _signUpWithGoogle()
+  +Widget build()
+}
+
+"pacman_application::screens::signup.dart::SignupState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::screens::signup.dart::SignupState"
+
+class "pacman_application::utils::appbar.dart::Appbar" {
+  +Text header
+  +BuildContext context
+  +bool canLogout
+  +Widget? title
+  +List<Widget>? actions
+  +double? elevation
+  +ShapeBorder? shape
+  +void signOut()
+}
+
+"pacman_application::utils::appbar.dart::Appbar" o-- "flutter::src::widgets::text.dart::Text"
+"pacman_application::utils::appbar.dart::Appbar" o-- "flutter::src::widgets::framework.dart::BuildContext"
+"pacman_application::utils::appbar.dart::Appbar" o-- "flutter::src::widgets::framework.dart::Widget"
+"pacman_application::utils::appbar.dart::Appbar" o-- "flutter::src::painting::borders.dart::ShapeBorder"
+"flutter::src::material::app_bar.dart::AppBar" <|-- "pacman_application::utils::appbar.dart::Appbar"
+
+class "pacman_application::utils::bonus_card.dart::BonusCard" {
+  +int i
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::utils::bonus_card.dart::BonusCard"
+
+class "pacman_application::utils::bonus_card.dart::BonusCardState" {
+  +bool isPressed
+  +bool isTimerFinish
+  +BonusType bonus
+  +bool haveGot
+  +int numGotten
+  +void initState()
+  +void bonusDialog()
+  +Image image()
+  +Widget build()
+}
+
+"pacman_application::utils::bonus_card.dart::BonusCardState" o-- "pacman_application::utils::bonus_type.dart::BonusType"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::utils::bonus_card.dart::BonusCardState"
+
+class "pacman_application::utils::bonus_type.dart::BonusType" {
+  +int index
+  {static} +List<BonusType> values
+  {static} +BonusType apple
+}
+
+"pacman_application::utils::bonus_type.dart::BonusType" o-- "pacman_application::utils::bonus_type.dart::BonusType"
+"dart::core::Enum" <|-- "pacman_application::utils::bonus_type.dart::BonusType"
+
+class "pacman_application::utils::game_displayer.dart::GameDisplayer" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::utils::game_displayer.dart::GameDisplayer"
+
+class "pacman_application::utils::game_displayer.dart::GameDisplayerState" {
+  -GameManager _gameManager
+  +GameManager newGame
+  +AudioPlayer audioPlayer
+  +void initState()
+  +void onGameOver()
+  +void onRetry()
+  +void onExit()
+  +void onGettingBonus()
+  +void dispose()
+  +Widget build()
+}
+
+"pacman_application::utils::game_displayer.dart::GameDisplayerState" o-- "pacman_application::game::game_manager.dart::GameManager"
+"pacman_application::utils::game_displayer.dart::GameDisplayerState" o-- "audioplayers::src::audioplayer.dart::AudioPlayer"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::utils::game_displayer.dart::GameDisplayerState"
+
+class "pacman_application::utils::loading_screen.dart::LoadingScreen" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::utils::loading_screen.dart::LoadingScreen"
+
+class "pacman_application::utils::loading_screen.dart::LoadingScreenState" {
+  -Timer _timer
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"pacman_application::utils::loading_screen.dart::LoadingScreenState" o-- "dart::async::Timer"
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::utils::loading_screen.dart::LoadingScreenState"
+
+class "pacman_application::utils::sidebar.dart::Sidebar" {
+  +State<StatefulWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pacman_application::utils::sidebar.dart::Sidebar"
+
+class "pacman_application::utils::sidebar.dart::SidebarState" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pacman_application::utils::sidebar.dart::SidebarState"
+
+
+@enduml

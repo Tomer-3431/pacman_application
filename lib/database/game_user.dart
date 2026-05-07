@@ -80,13 +80,13 @@ class GameUser {
     bonusTable = <BonusType, int>{};
     final entries = await Future.wait(
       BonusType.values.map((bonus) {
-        return _getBonusDate(bonus, ref);
+        return _getBonusData(bonus, ref);
       }),
     );
     bonusTable.addEntries(entries);
   }
 
-  Future<MapEntry<BonusType, int>> _getBonusDate(
+  Future<MapEntry<BonusType, int>> _getBonusData(
     BonusType bonus,
     DatabaseReference ref,
   ) async {

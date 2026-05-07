@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:pacman_application/game/bonus.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/controller/controller.dart';
-import 'package:pacman_application/game/controller/retry_button.dart';
+import 'package:pacman_application/game/controller/end_game_buttons.dart';
 import 'package:pacman_application/game/map/game_map.dart';
 import 'package:pacman_application/game/ghosts/ghost.dart';
 import 'package:pacman_application/game/pacman.dart';
@@ -26,14 +26,14 @@ class GameScreen extends StatefulWidget {
     required this.bonus,
     required this.dt,
     required this.bonusesTaken,
-    required this.retryButton,
+    required this.endGameButtons,
     required this.isGameOver,
   });
 
   final Widget Function(double tileSize) gameMessege;
   final String Function() topText;
   final Controller controller;
-  final RetryButton retryButton;
+  final EndGameButtons endGameButtons;
   final bool Function() isGameOver;
   final Pacman pacman;
   final List<Ghost> ghosts;
@@ -229,7 +229,7 @@ class _GameScreenState extends State<GameScreen> {
             buildBonusArea(widget.bonusesTaken),
 
             // const Spacer(),
-            widget.isGameOver() ? widget.retryButton : widget.controller,
+            widget.isGameOver() ? widget.endGameButtons : widget.controller,
           ],
         ),
       ),

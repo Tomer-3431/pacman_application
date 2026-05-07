@@ -180,9 +180,10 @@ class LoginState extends State<Login> {
           header: Text("LOGIN", style: headerTextStyle),
           canLogout: false,
         ),
-        body: SafeArea(
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+        body: Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+          // TODO: Fix Keybaord not showing up for safe area
+          child: SingleChildScrollView(
             child: Column(
               children: [
                 SizedBox(height: 150),
@@ -194,9 +195,9 @@ class LoginState extends State<Login> {
                       "Hi there! Nice to see you again.",
                       style: TextStyle(fontSize: 12, color: Colors.grey[800]),
                     ),
-
+                    
                     SizedBox(height: 15),
-
+                    
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 2,
@@ -209,12 +210,12 @@ class LoginState extends State<Login> {
                         ),
                         TextField(
                           controller: emailController,
-                          keyboardType: TextInputType.emailAddress,
+                          // keyboardType: TextInputType.emailAddress,
                           onSubmitted: (text) => setState(() {}),
                         ),
                       ],
                     ),
-
+                    
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -231,9 +232,9 @@ class LoginState extends State<Login> {
                         ),
                       ],
                     ),
-
+                    
                     SizedBox(height: 15),
-
+                    
                     ElevatedButton(
                       onPressed: () async {
                         if (emailController.text.isNotEmpty &&
@@ -244,13 +245,13 @@ class LoginState extends State<Login> {
                                   email: emailController.text,
                                   password: passwordController.text,
                                 );
-
+                    
                             isAnonymous = false;
                             currentUser = GameUser.fromUid(
                               uid: userCredentials.user!.uid,
                             );
                             _savePrefs(currentUser);
-
+                    
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -280,13 +281,13 @@ class LoginState extends State<Login> {
                             ? Theme.of(context).focusColor
                             : Theme.of(context).primaryColor,
                       ),
-
+                    
                       child: Text(
                         "Sign In",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-
+                    
                     // ── Divider ─────────────────────────────────────────
                     Row(
                       children: [
@@ -301,7 +302,7 @@ class LoginState extends State<Login> {
                         Expanded(child: Divider(color: Colors.grey.shade300)),
                       ],
                     ),
-
+                    
                     // ── Google Sign-In button ───────────────────────────
                     OutlinedButton(
                       onPressed: _googleLoading ? null : _signInWithGoogle,
@@ -338,9 +339,9 @@ class LoginState extends State<Login> {
                               ],
                             ),
                     ),
-
+                    
                     SizedBox(height: 10),
-
+                    
                     GestureDetector(
                       onTap: () {
                         Navigator.pushReplacement(
@@ -355,9 +356,9 @@ class LoginState extends State<Login> {
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
-
+                    
                     SizedBox(height: 10),
-
+                    
                     GestureDetector(
                       onTap: () {
                         isAnonymous = true;

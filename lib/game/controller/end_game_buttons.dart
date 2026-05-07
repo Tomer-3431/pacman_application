@@ -1,18 +1,18 @@
 
 import 'package:flutter/material.dart';
 
-class RetryButton extends StatefulWidget {
+class EndGameButtons extends StatefulWidget {
   final double size;
   final VoidCallback onRetry;
   final VoidCallback onExit;
 
-  const RetryButton({super.key, required this.size, required this.onRetry, required this.onExit});
+  const EndGameButtons({super.key, required this.size, required this.onRetry, required this.onExit});
 
   @override
-  State<StatefulWidget> createState() => RetryButtonState();
+  State<StatefulWidget> createState() => EndGameButtonsState();
 }
 
-class RetryButtonState extends State<RetryButton> {
+class EndGameButtonsState extends State<EndGameButtons> {
   bool _isRetryPressed = false;
   bool _isExitPressed = false;
 

@@ -24,7 +24,7 @@ class LeaderboardState extends State<Leaderboard> {
     super.initState();
 
     getUsers();
-    Timer(Duration(milliseconds: 200), () {
+    Timer(Duration(milliseconds: 500), () {
       setState(() {
         
       });

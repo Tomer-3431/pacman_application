@@ -5,7 +5,7 @@ import 'package:pacman_application/constants.dart';
 import 'package:pacman_application/game/bonus.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/controller/controller.dart';
-import 'package:pacman_application/game/controller/retry_button.dart';
+import 'package:pacman_application/game/controller/end_game_buttons.dart';
 import 'package:pacman_application/game/map/game_map.dart';
 import 'package:pacman_application/game/game_screen.dart';
 import 'package:pacman_application/game/game_timer.dart';
@@ -96,10 +96,10 @@ class GameManager {
     bonusesTaken: bonusesTaken,
     getHighScore: () => highScore,
     isGameOver: () => isGameOver,
-    retryButton: retryButton,
+    endGameButtons: endGameButtons,
   );
 
-  late RetryButton retryButton = RetryButton(
+  late EndGameButtons endGameButtons = EndGameButtons(
     size: 120,
     onRetry: onRetry,
     onExit: onExit,
