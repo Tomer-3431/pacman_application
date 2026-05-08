@@ -4,14 +4,14 @@ import 'package:pacman_application/screens/read_me.dart';
 import 'package:pacman_application/screens/collectables_screen.dart';
 import 'package:pacman_application/utils/game_displayer.dart';
 import 'package:pacman_application/screens/home_screen.dart';
-import 'package:pacman_application/screens/leaderboard.dart';
+import 'package:pacman_application/screens/leaderboard_screen.dart';
 import 'package:pacman_application/screens/settings.dart';
 
 class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
 
   @override
-  State<StatefulWidget> createState() => SidebarState();
+  State<Sidebar> createState() => SidebarState();
 }
 
 class SidebarState extends State<Sidebar> {
@@ -102,7 +102,7 @@ class SidebarState extends State<Sidebar> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (final BuildContext context) => Leaderboard(),
+                  builder: (final BuildContext context) => LeaderboardScreen(),
                 ),
               );
             },

@@ -11,13 +11,13 @@ class BonusCard extends StatefulWidget {
   final int i;
 
   @override
-  State<StatefulWidget> createState() => BonusCardState();
+  State<BonusCard> createState() => BonusCardState();
 }
 
-const String startDir = "assets/game/bonuses/";
-const String endDir = ".png";
-
 class BonusCardState extends State<BonusCard> {
+  static const String startDir = "assets/game/bonuses/";
+  static const String endDir = ".png";
+
   bool isPressed = false;
   bool isTimerFinish = false;
   late BonusType bonus = BonusType.values[widget.i];

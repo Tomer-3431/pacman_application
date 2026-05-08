@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/screens/home_screen.dart';
 
@@ -9,7 +10,7 @@ class LoadingScreen extends StatefulWidget {
 
 
   @override
-  State<StatefulWidget> createState() => LoadingScreenState();
+  State<LoadingScreen> createState() => LoadingScreenState();
 }
 
 class LoadingScreenState extends State<LoadingScreen> {
@@ -27,6 +28,12 @@ class LoadingScreenState extends State<LoadingScreen> {
   @override
   void dispose() {
     _timer.cancel();
+    
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
+
     super.dispose();
   }
 

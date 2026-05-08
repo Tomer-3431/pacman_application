@@ -3,20 +3,20 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/database/game_user.dart';
 import 'package:pacman_application/database/session.dart';
 import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
 
-class Leaderboard extends StatefulWidget {
-  const Leaderboard({super.key});
+class LeaderboardScreen extends StatefulWidget {
+  const LeaderboardScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => LeaderboardState();
+  State<LeaderboardScreen> createState() => LeaderboardScreenState();
 }
 
-class LeaderboardState extends State<Leaderboard> {
+class LeaderboardScreenState extends State<LeaderboardScreen> {
   List<GameUser> users = [];
 
   @override

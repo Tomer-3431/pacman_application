@@ -41,7 +41,6 @@ class Blinky extends Ghost {
       pacmanY.round(),
       x.round(),
       y.round(),
-      getGameMap(),
     );
     if (direction != null) {
       nextDirection = direction;

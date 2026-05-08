@@ -14,8 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class GameScreen extends StatefulWidget {
   const GameScreen({
     super.key,
-    required this.gameMessege,
-    required this.topText,
+    required this.gameMessage,
     required this.controller,
     required this.gameMap,
     required this.pacman,
@@ -30,8 +29,7 @@ class GameScreen extends StatefulWidget {
     required this.isGameOver,
   });
 
-  final Widget Function(double tileSize) gameMessege;
-  final String Function() topText;
+  final Widget Function(double tileSize) gameMessage;
   final Controller controller;
   final EndGameButtons endGameButtons;
   final bool Function() isGameOver;
@@ -51,7 +49,6 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   Timer? _timer;
-  double time = 0;
 
   Color? customPacmanColor;
   Color? customBlinkyColor;
@@ -69,7 +66,6 @@ class _GameScreenState extends State<GameScreen> {
     _timer = Timer.periodic(
       Duration(milliseconds: (widget.dt * 1000).round()),
       (timer) {
-        time += widget.dt;
         setState(() {});
       },
     );
@@ -205,7 +201,7 @@ class _GameScreenState extends State<GameScreen> {
                 //   ),
                 // ),
 
-                widget.gameMessege(tileSize),
+                widget.gameMessage(tileSize),
 
                 ...widget.gameMap.dots.map((dot) => dot.showOnStack(tileSize)),
                 ...widget.gameMap.superPoints.map(

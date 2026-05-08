@@ -49,7 +49,6 @@ class Pinky extends Ghost {
       pacmanY.round() + i * pacmanDirection.toDelta().$2,
       x.round(),
       y.round(),
-      getGameMap(),
     );
     if (direction != null) {
       nextDirection = direction;

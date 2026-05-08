@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/database/game_user.dart';
 import 'package:pacman_application/database/session.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
@@ -17,7 +17,7 @@ class Login extends StatefulWidget {
   const Login({super.key});
 
   @override
-  State<StatefulWidget> createState() => LoginState();
+  State<Login> createState() => LoginState();
 }
 
 class LoginState extends State<Login> {
@@ -30,7 +30,7 @@ class LoginState extends State<Login> {
   void initState() {
     super.initState();
 
-    _checkPrefs();
+    // _checkPrefs();
   }
 
   @override
@@ -180,202 +180,209 @@ class LoginState extends State<Login> {
           header: Text("LOGIN", style: headerTextStyle),
           canLogout: false,
         ),
-        body: Container(
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-          // TODO: Fix Keybaord not showing up for safe area
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: 150),
-                Column(
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 10,
-                  children: [
-                    Text(
-                      "Hi there! Nice to see you again.",
-                      style: TextStyle(fontSize: 12, color: Colors.grey[800]),
-                    ),
-                    
-                    SizedBox(height: 15),
-                    
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 2,
-                      children: [
-                        Text(
-                          "Email",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: 150),
+                  Column(
+                    // crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 10,
+                    children: [
+                      Text(
+                        "Hi there! Nice to see you again.",
+                        style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                      ),
+
+                      SizedBox(height: 15),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 2,
+                        children: [
+                          Text(
+                            "Email",
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                            ),
                           ),
-                        ),
-                        TextField(
-                          controller: emailController,
-                          // keyboardType: TextInputType.emailAddress,
-                          onSubmitted: (text) => setState(() {}),
-                        ),
-                      ],
-                    ),
-                    
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Password",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
+                          TextField(
+                            controller: emailController,
+                            // keyboardType: TextInputType.emailAddress,
+                            onSubmitted: (text) => setState(() {}),
                           ),
-                        ),
-                        TextField(
-                          controller: passwordController,
-                          obscureText: true,
-                          onSubmitted: (value) => setState(() {}),
-                        ),
-                      ],
-                    ),
-                    
-                    SizedBox(height: 15),
-                    
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (emailController.text.isNotEmpty &&
-                            passwordController.text.isNotEmpty) {
-                          try {
-                            final userCredentials = await FirebaseAuth.instance
-                                .signInWithEmailAndPassword(
-                                  email: emailController.text,
-                                  password: passwordController.text,
-                                );
-                    
-                            isAnonymous = false;
-                            currentUser = GameUser.fromUid(
-                              uid: userCredentials.user!.uid,
-                            );
-                            _savePrefs(currentUser);
-                    
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (final BuildContext context) =>
-                                    HomeScreen(),
-                              ),
-                            );
-                          } on FirebaseAuthException catch (e) {
-                            if (kDebugMode) {
-                              print('error: ${e.code}');
-                            }
-                          } catch (e) {
-                            if (kDebugMode) {
-                              print(e);
+                        ],
+                      ),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Password",
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: true,
+                            onSubmitted: (value) => setState(() {}),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 15),
+
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (emailController.text.isNotEmpty &&
+                              passwordController.text.isNotEmpty) {
+                            try {
+                              final userCredentials = await FirebaseAuth
+                                  .instance
+                                  .signInWithEmailAndPassword(
+                                    email: emailController.text,
+                                    password: passwordController.text,
+                                  );
+
+                              isAnonymous = false;
+                              currentUser = GameUser.fromUid(
+                                uid: userCredentials.user!.uid,
+                              );
+                              _savePrefs(currentUser);
+
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (final BuildContext context) =>
+                                      HomeScreen(),
+                                ),
+                              );
+                            } on FirebaseAuthException catch (e) {
+                              if (kDebugMode) {
+                                print('error: ${e.code}');
+                              }
+                            } catch (e) {
+                              if (kDebugMode) {
+                                print(e);
+                              }
                             }
                           }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(1000, 40),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(8),
-                        ),
-                        backgroundColor:
-                            emailController.text.isEmpty ||
-                                passwordController.text.isEmpty
-                            ? Theme.of(context).focusColor
-                            : Theme.of(context).primaryColor,
-                      ),
-                    
-                      child: Text(
-                        "Sign In",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    
-                    // ── Divider ─────────────────────────────────────────
-                    Row(
-                      children: [
-                        Expanded(child: Divider(color: Colors.grey.shade300)),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            "or",
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(1000, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(8),
                           ),
+                          backgroundColor:
+                              emailController.text.isEmpty ||
+                                  passwordController.text.isEmpty
+                              ? Theme.of(context).focusColor
+                              : Theme.of(context).primaryColor,
                         ),
-                        Expanded(child: Divider(color: Colors.grey.shade300)),
-                      ],
-                    ),
-                    
-                    // ── Google Sign-In button ───────────────────────────
-                    OutlinedButton(
-                      onPressed: _googleLoading ? null : _signInWithGoogle,
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: Size(1000, 40),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(8),
+
+                        child: Text(
+                          "Sign In",
+                          style: TextStyle(color: Colors.white),
                         ),
-                        side: BorderSide(color: Colors.grey.shade300),
-                        backgroundColor: Colors.white,
                       ),
-                      child: _googleLoading
-                          ? SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Theme.of(context).primaryColor,
+
+                      // ── Divider ─────────────────────────────────────────
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.grey.shade300)),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              "or",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
                               ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset("assets/GoogleG.png"),
-                                SizedBox(width: 10),
-                                Text(
-                                  "Continue with Google",
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
                             ),
-                    ),
-                    
-                    SizedBox(height: 10),
-                    
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (final BuildContext context) => Signup(),
                           ),
-                        );
-                      },
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(color: Theme.of(context).primaryColor),
+                          Expanded(child: Divider(color: Colors.grey.shade300)),
+                        ],
                       ),
-                    ),
-                    
-                    SizedBox(height: 10),
-                    
-                    GestureDetector(
-                      onTap: () {
-                        isAnonymous = true;
-                        _removePrefs();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (final BuildContext context) =>
-                                HomeScreen(),
+
+                      // ── Google Sign-In button ───────────────────────────
+                      OutlinedButton(
+                        onPressed: _googleLoading ? null : _signInWithGoogle,
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: Size(1000, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(8),
                           ),
-                        );
-                      },
-                      child: Text("Enter as a guest"),
-                    ),
-                  ],
-                ),
-              ],
+                          side: BorderSide(color: Colors.grey.shade300),
+                          backgroundColor: Colors.white,
+                        ),
+                        child: _googleLoading
+                            ? SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset("assets/GoogleG.png"),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "Continue with Google",
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+
+                      SizedBox(height: 10),
+
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (final BuildContext context) => Signup(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 10),
+
+                      GestureDetector(
+                        onTap: () {
+                          isAnonymous = true;
+                          _removePrefs();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (final BuildContext context) =>
+                                  HomeScreen(),
+                            ),
+                          );
+                        },
+                        child: Text("Enter as a guest"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -7,8 +7,8 @@ import 'package:pacman_application/game/pacman.dart';
 import 'package:pacman_application/utils/util.dart';
 
 class Bonus {
-  String name = "Bonus";
-  bool isVisiable = false;
+  final String name = "Bonus";
+  bool isVisible = false;
   BonusType currentType = BonusType.cherry;
   late Random random;
 
@@ -21,7 +21,7 @@ class Bonus {
     x = gameManager.gameMap.bonusX;
     y = gameManager.gameMap.bonusY;
     random = Random();
-    isVisiable = false;
+    isVisible = false;
   }
 
   void Function(BonusType bonusType)? onEaten;
@@ -29,17 +29,17 @@ class Bonus {
   Pacman getPacman() => gameManager.pacman;
 
   void update(double dt) {
-    if (isVisiable && dist(getPacman().x - x, getPacman().y - y) <= 0.5) {
+    if (isVisible && dist(getPacman().x - x, getPacman().y - y) <= 0.5) {
       onEaten?.call(currentType);
-      isVisiable = false;
+      isVisible = false;
     }
   }
 
-  void setVisiable() {
-    if (!isVisiable) {
+  void setVisible() {
+    if (!isVisible) {
       currentType = BonusType.values[random.nextInt(BonusType.values.length)];
     }
-    isVisiable = true;
+    isVisible = true;
   }
 
   static const String bonusAssetsPath = "assets/game/bonuses/";
@@ -48,7 +48,7 @@ class Bonus {
   Widget getSprite(double tileSize) => Positioned(
     left: x * tileSize,
     top: y * tileSize,
-    child: isVisiable
+    child: isVisible
         ? Image.asset(
             "$bonusAssetsPath${currentType.name}$bonusesAssetsEndFile",
           )

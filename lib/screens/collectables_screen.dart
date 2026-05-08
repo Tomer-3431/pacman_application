@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:flutter/services.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
@@ -10,10 +10,21 @@ class CollectablesScreen extends StatefulWidget {
   const CollectablesScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => CollectablesScreenState();
+  State<CollectablesScreen> createState() => CollectablesScreenState();
 }
 
 class CollectablesScreenState extends State<CollectablesScreen> {
+  
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp
+    ]);
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: Appbar(

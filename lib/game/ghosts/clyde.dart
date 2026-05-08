@@ -31,7 +31,7 @@ class Clyde extends Ghost {
     if (dist(pacmanX - x, pacmanY - y) >= 8) {
       target = (pacmanX.round(), pacmanY.round());
     } 
-    var direction = ghostChase(target.$1, target.$2, x.round(), y.round(), getGameMap());
+    var direction = ghostChase(target.$1, target.$2, x.round(), y.round());
     if (direction != null) {
       nextDirection = direction;
     }

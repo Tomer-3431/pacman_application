@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
 
@@ -8,7 +8,7 @@ class ReadMe extends StatefulWidget {
   const ReadMe({super.key});
 
   @override
-  State<StatefulWidget> createState() => ReadMeState();
+  State<ReadMe> createState() => ReadMeState();
 }
 
 class ReadMeState extends State<ReadMe> {

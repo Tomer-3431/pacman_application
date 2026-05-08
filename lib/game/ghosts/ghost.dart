@@ -172,7 +172,6 @@ abstract class Ghost extends AnimatedCharacter {
       scatterLocation.$2,
       x.round(),
       y.round(),
-      getGameMap(),
     );
     if (direction != null) {
       nextDirection = direction;
@@ -257,7 +256,6 @@ abstract class Ghost extends AnimatedCharacter {
       getGameMap().ghostHouseY,
       x.round(),
       y.round(),
-      getGameMap(),
     );
     if (direction != null) nextDirection = direction;
 
@@ -365,89 +363,91 @@ abstract class Ghost extends AnimatedCharacter {
     updateState();
     updateAnimation(dt);
   }
-}
 
-Direction? ghostChase(int tx, int ty, int cx, int cy, GameMap gameMap) {
-  // return simpleChase(tx, ty, cx, cy, gameMap);
-  return complexChase(tx, ty, cx, cy, gameMap);
-  // return (sqrt((tx - cx) * (tx - cx) + (ty - cy) * (ty - cy)) <= 10)
-  //     ? simpleChase(tx, ty, cx, cy, gameMap)
-  //     : complexChase(tx, ty, cx, cy, gameMap);
-}
-
-Direction? simpleChase(int tx, int ty, int cx, int cy, GameMap gameMap) {
-  if (tx == cx && ty == cy) return null;
-
-  double minDistance = double.infinity;
-  Direction? minDisDir;
-
-  for (var dir in Direction.values) {
-    double dis = dist(
-      tx - (cx + dir.toDelta().$1),
-      ty - (cy + dir.toDelta().$2),
-    );
-    if (!gameMap.isWall(cx, cy, dir) && minDistance > dis) {
-      minDistance = dis;
-      minDisDir = dir;
-    }
+  Direction? ghostChase(int tx, int ty, int cx, int cy) {
+    // return simpleChase(tx, ty, cx, cy, gameMap);
+    return complexChase(tx, ty, cx, cy);
+    // return (sqrt((tx - cx) * (tx - cx) + (ty - cy) * (ty - cy)) <= 10)
+    //     ? simpleChase(tx, ty, cx, cy, gameMap)
+    //     : complexChase(tx, ty, cx, cy, gameMap);
   }
 
-  return minDisDir;
-}
+  Direction? simpleChase(int tx, int ty, int cx, int cy) {
+    if (tx == cx && ty == cy) return null;
 
-Direction? complexChase(int tx, int ty, int cx, int cy, GameMap gameMap) {
-  if (tx == cx && ty == cy) return null;
-
-  final queue = Queue<(int, int)>();
-  final firstDir = <int, Direction>{};
-
-  int key(int x, int y) => y * gameMap.kCols + x;
-
-  for (var dir in Direction.values) {
-    final nx = (cx + dir.toDelta().$1 + gameMap.kCols) % gameMap.kCols;
-    final ny = (cy + dir.toDelta().$2 + gameMap.kRows) % gameMap.kRows;
-    if (nx < 0 || ny < 0 || nx >= gameMap.kCols || ny >= gameMap.kRows) {
-      continue;
-    }
-    final nk = key(nx, ny);
-    if (firstDir.containsKey((nk))) {
-      continue;
-    }
-    if (gameMap.isWall(cx, cy, dir)) {
-      continue;
-    }
-    firstDir[nk] = dir;
-    queue.add((nx, ny));
-  }
-
-  firstDir[key(cx, cy)] = Direction.up; // dummy
-
-  while (queue.isNotEmpty) {
-    final (x, y) = queue.removeFirst();
-
-    if (x == tx && y == ty) {
-      return firstDir[key(x, y)];
-    }
+    double minDistance = double.infinity;
+    Direction? minDisDir;
 
     for (var dir in Direction.values) {
-      final nx = (x + dir.toDelta().$1 + gameMap.kCols) % gameMap.kCols;
-      final ny = (y + dir.toDelta().$2 + gameMap.kRows) % gameMap.kRows;
+      double dis = dist(
+        tx - (cx + dir.toDelta().$1),
+        ty - (cy + dir.toDelta().$2),
+      );
+      if (!getGameMap().isWall(cx, cy, dir) && minDistance > dis) {
+        minDistance = dis;
+        minDisDir = dir;
+      }
+    }
+
+    return minDisDir;
+  }
+
+  Direction? complexChase(int tx, int ty, int cx, int cy) {
+    if (tx == cx && ty == cy) return null;
+
+    final GameMap gameMap = getGameMap();
+
+    final queue = Queue<(int, int)>();
+    final firstDir = <int, Direction>{};
+
+    int key(int x, int y) => y * gameMap.kCols + x;
+
+    for (var dir in Direction.values) {
+      final nx = (cx + dir.toDelta().$1 + gameMap.kCols) % gameMap.kCols;
+      final ny = (cy + dir.toDelta().$2 + gameMap.kRows) % gameMap.kRows;
       if (nx < 0 || ny < 0 || nx >= gameMap.kCols || ny >= gameMap.kRows) {
         continue;
       }
       final nk = key(nx, ny);
-      if (firstDir.containsKey(nk)) {
+      if (firstDir.containsKey((nk))) {
         continue;
       }
-      if (gameMap.isWall(x, y, dir)) {
+      if (gameMap.isWall(cx, cy, dir)) {
         continue;
       }
-      firstDir[nk] = firstDir[key(x, y)]!;
+      firstDir[nk] = dir;
       queue.add((nx, ny));
     }
-  }
 
-  return null;
+    firstDir[key(cx, cy)] = Direction.up; // dummy
+
+    while (queue.isNotEmpty) {
+      final (x, y) = queue.removeFirst();
+
+      if (x == tx && y == ty) {
+        return firstDir[key(x, y)];
+      }
+
+      for (var dir in Direction.values) {
+        final nx = (x + dir.toDelta().$1 + gameMap.kCols) % gameMap.kCols;
+        final ny = (y + dir.toDelta().$2 + gameMap.kRows) % gameMap.kRows;
+        if (nx < 0 || ny < 0 || nx >= gameMap.kCols || ny >= gameMap.kRows) {
+          continue;
+        }
+        final nk = key(nx, ny);
+        if (firstDir.containsKey(nk)) {
+          continue;
+        }
+        if (gameMap.isWall(x, y, dir)) {
+          continue;
+        }
+        firstDir[nk] = firstDir[key(x, y)]!;
+        queue.add((nx, ny));
+      }
+    }
+
+    return null;
+  }
 }
 
 enum GhostState { chase, scatter, frightened0, frightened1, eaten, idle }

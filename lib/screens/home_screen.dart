@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/database/session.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/utils/game_displayer.dart';
@@ -12,7 +12,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
 class HomeScreenState extends State<HomeScreen> {

@@ -61,7 +61,6 @@ class Inky extends Ghost {
       target.$2,
       x.round(),
       y.round(),
-      getGameMap(),
     );
     if (direction != null) {
       nextDirection = direction;

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/game/bonus.dart';
 import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/controller/controller.dart';
@@ -20,7 +20,6 @@ class GameManager {
   int score = 0;
   int highScore = 0;
   int screenNum = 0;
-  int currentGhostEatenScore = 0;
   int nextGhostEatenScore = 10;
 
   late List<GameTimer> gameTimers = [bonusTimer];
@@ -59,7 +58,6 @@ class GameManager {
             for (var ghost in ghosts) {
               if (ghost.state == GhostState.frightened1) {
                 ghost.state = GhostState.chase;
-                currentGhostEatenScore = 0;
                 nextGhostEatenScore = 10;
               }
             }
@@ -81,10 +79,7 @@ class GameManager {
   );
 
   late GameScreen currentScreen = GameScreen(
-    gameMessege: (x) => gameMessege(x),
-    topText: () {
-      return ghosts.first.state.name;
-    },
+    gameMessage: (x) => gameMessage(x),
     gameMap: gameMap,
     controller: controller,
     pacman: pacman,
@@ -126,7 +121,7 @@ class GameManager {
       if (lives <= 0) {
         isGameOver = true;
 
-        gameMessege = (double tileSize) => Positioned(
+        gameMessage = (double tileSize) => Positioned(
           top: tileSize * 16.3,
           left: tileSize * 9.3,
           child: Center(
@@ -154,9 +149,8 @@ class GameManager {
 
   void onEaten() {
     paused = true;
-    currentGhostEatenScore += nextGhostEatenScore;
-    if ((score % 100) >= currentGhostEatenScore) lives++;
-    score += currentGhostEatenScore;
+    if (100 - (score % 100) <= nextGhostEatenScore) lives++;
+    score += nextGhostEatenScore;
     nextGhostEatenScore *= 2;
     Timer(Duration(microseconds: 500), () => paused = false);
   }
@@ -169,7 +163,7 @@ class GameManager {
   ];
 
   int lives = 3;
-  Widget Function(double tileSize) gameMessege = (double tileSize) => Positioned(
+  Widget Function(double tileSize) gameMessage = (double tileSize) => Positioned(
     top: 16.2 * tileSize,
     left: 10.5 * tileSize,
     child: Center(
@@ -202,7 +196,7 @@ class GameManager {
   late GameTimer bonusTimer = GameTimer(
     10,
     onEnd: () {
-      bonus.setVisiable();
+      bonus.setVisible();
     },
     isLoop: true,
   );
@@ -259,7 +253,7 @@ class GameManager {
     _audioPlayer.play(AssetSource("audio/Start_Music.mp3"));
     highScore = getHighScoreFromDisplayer?.call() ?? highScore;
     Timer(Duration(seconds: 5), () {
-      gameMessege = (x) => Container();
+      gameMessage = (x) => Container();
       bonusTimer.start();
       stopwatch.start();
       periodicTimer = Timer.periodic(

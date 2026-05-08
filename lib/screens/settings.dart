@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +10,7 @@ class Settings extends StatefulWidget {
   const Settings({super.key});
 
   @override
-  State<StatefulWidget> createState() => SettingsState();
+  State<Settings> createState() => SettingsState();
 }
 
 class SettingsState extends State<Settings> {

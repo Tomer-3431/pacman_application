@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/screens/login.dart';
 import 'package:pacman_application/database/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';

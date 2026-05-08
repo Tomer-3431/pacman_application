@@ -1,7 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:pacman_application/constants.dart';
+import 'package:pacman_application/utils/constants.dart';
 import 'package:pacman_application/game/animation/animated_character.dart';
 import 'package:pacman_application/game/direction.dart';
 import 'package:pacman_application/game/map/game_map.dart';
@@ -21,12 +19,7 @@ class Pacman extends AnimatedCharacter {
   @override
   double y = 0;
 
-  double speed = 15;
-  double acceleration = 240;
-  final double jerk = 500;
-  final double maxSpeed = 50;
-  final double maxAcceleration = 280;
-  final double startSpeed = 30;
+  final double speed = 15;
 
   late SpriteAnimation deathAnimation;
   late SpriteAnimation idleAnimation;
@@ -46,8 +39,8 @@ class Pacman extends AnimatedCharacter {
   ];
 
   Pacman({required super.gameManager}) {
-    x = getGameMap().startingCol;
-    y = getGameMap().startingRow;
+    x = getGameMap().startingX;
+    y = getGameMap().startingY;
 
     deathAnimation = SpriteAnimation(
       characterName: "pacman",
@@ -120,14 +113,10 @@ class Pacman extends AnimatedCharacter {
       currentDirection,
       isPacman: true,
     )) {
-      // speed = startSpeed;
-      acceleration = 100;
       x = x.roundToDouble();
       y = y.roundToDouble();
       return;
     }
-    acceleration = min(acceleration + jerk * dt, maxAcceleration);
-    // speed = min(speed + acceleration * dt, maxSpeed);
 
     switch (currentDirection) {
       case Direction.up:
@@ -158,12 +147,10 @@ class Pacman extends AnimatedCharacter {
 
   @override
   void reset() {
-    x = getGameMap().startingCol;
-    y = getGameMap().startingRow;
+    x = getGameMap().startingX;
+    y = getGameMap().startingY;
     currentDirection = Direction.left;
     nextDirection = Direction.left;
-    // speed = 40;
-    acceleration = 240;
   }
 
   Widget nextDirectionArrow(double tileSize, {Color? color}) {

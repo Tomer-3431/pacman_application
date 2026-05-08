@@ -28,8 +28,8 @@ class GameMap {
   final int kCols = 28;
   final int kRows = 31;
 
-  final double startingCol = 13.5;
-  final double startingRow = 23;
+  final double startingX = 13.5;
+  final double startingY = 23;
 
   final int ghostHouseX = 14;
   final int ghostHouseY = 15;

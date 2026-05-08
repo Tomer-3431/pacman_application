@@ -10,7 +10,7 @@ class GameDisplayer extends StatefulWidget {
   const GameDisplayer({super.key});
 
   @override
-  State<StatefulWidget> createState() => GameDisplayerState();
+  State<GameDisplayer> createState() => GameDisplayerState();
 }
 
 class GameDisplayerState extends State<GameDisplayer> {

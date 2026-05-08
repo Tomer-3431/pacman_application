@@ -9,7 +9,7 @@ class EndGameButtons extends StatefulWidget {
   const EndGameButtons({super.key, required this.size, required this.onRetry, required this.onExit});
 
   @override
-  State<StatefulWidget> createState() => EndGameButtonsState();
+  State<EndGameButtons> createState() => EndGameButtonsState();
 }
 
 class EndGameButtonsState extends State<EndGameButtons> {
