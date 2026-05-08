@@ -9,6 +9,12 @@ import 'package:pacman_application/database/session.dart';
 import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
 
+/// Shows all registered players ranked by their all-time high score.
+///
+/// Data is fetched from Firebase Realtime Database once when the screen
+/// mounts. The top three entries are highlighted with gold, silver, and
+/// bronze trophy icons respectively; remaining entries show a numbered
+/// circular badge. The currently signed-in player's row is highlighted.
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
 
@@ -17,76 +23,69 @@ class LeaderboardScreen extends StatefulWidget {
 }
 
 class LeaderboardScreenState extends State<LeaderboardScreen> {
-  List<GameUser> users = [];
+  // ── Fields ───────────────────────────────────────────────────────────────
+
+  /// All users fetched from the database. Sorted by high score at build time.
+  final List<GameUser> _users = [];
+
+  // ── Lifecycle ────────────────────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
 
-    getUsers();
-    Timer(Duration(milliseconds: 500), () {
-      setState(() {
-        
-      });
-    });
-  }
+    _loadUsers();
 
-  void getUsers() async {
-    final ref = FirebaseDatabase.instance.ref("users");
-    final snapshot = await ref.get();
-
-    if (snapshot.exists) {
-      for (var child in snapshot.children) {
-        if (child.key != "0") {
-          users.add(GameUser.fromUid(uid: child.key!));
-        }
-      }
-    }
-    setState(() {
-      
+    // Trigger a rebuild after 500 ms to display any users whose async data
+    // fetch has completed by then.
+    Timer(const Duration(milliseconds: 500), () {
+      if (mounted) setState(() {});
     });
   }
 
   @override
   void dispose() {
-    super.dispose();
-
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitDown,
       DeviceOrientation.portraitUp,
     ]);
+    super.dispose();
   }
+
+  // ── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    final sortedUsers = List<GameUser>.from(users)
+    // Sort descending by high score each time the widget rebuilds.
+    final sortedUsers = List<GameUser>.from(_users)
       ..sort((a, b) => b.highScore.compareTo(a.highScore));
 
     return Scaffold(
       appBar: Appbar(
         context: context,
-        header: Text(
-          "LEADERBOARD",
-          style: headerTextStyle,
-        ),
+        header: Text('LEADERBOARD', style: headerTextStyle),
       ),
-      drawer: Sidebar(),
+      drawer: const Sidebar(),
       body: SafeArea(
         child: ListView.builder(
-          itemCount: users.length,
-          itemBuilder: (context, index) {
+          itemCount: sortedUsers.length,
+          itemBuilder: (_, index) {
             final user = sortedUsers[index];
             final rank = index + 1;
 
             return ListTile(
+              // Highlight the current user's row.
               selected: user == currentUser,
-              leading: _getRankBadge(rank),
+              leading: _rankBadge(rank),
               title: Text(
                 user.name,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
               trailing: Text(
-                "${user.highScore}",
+                '${user.highScore}',
                 style: TextStyle(
                   color: Colors.yellow[900],
                   fontSize: 20,
@@ -100,8 +99,31 @@ class LeaderboardScreenState extends State<LeaderboardScreen> {
     );
   }
 
-  Widget _getRankBadge(int rank) => Container(
-    margin: EdgeInsets.all(2),
+  // ── Private helpers ──────────────────────────────────────────────────────
+
+  /// Fetches all user records from `users/` in Firebase and populates
+  /// [_users], skipping the anonymous-guest placeholder (uid `"0"`).
+  void _loadUsers() async {
+    final ref = FirebaseDatabase.instance.ref('users');
+    final snapshot = await ref.get();
+
+    if (snapshot.exists) {
+      for (final child in snapshot.children) {
+        if (child.key != '0') {
+          _users.add(GameUser.fromUid(uid: child.key!));
+        }
+      }
+    }
+
+    if (mounted) setState(() {});
+  }
+
+  /// Returns a rank indicator widget.
+  ///
+  /// Ranks 1–3 receive a trophy icon in gold, silver, or bronze. All other
+  /// ranks receive a circular avatar with the rank number.
+  Widget _rankBadge(int rank) => Container(
+    margin: const EdgeInsets.all(2),
     child: switch (rank) {
       1 => const Icon(Icons.emoji_events, color: Color(0xFFFFD700), size: 32),
       2 => const Icon(Icons.emoji_events, color: Color(0xFFC0C0C0), size: 28),
@@ -110,7 +132,7 @@ class LeaderboardScreenState extends State<LeaderboardScreen> {
         backgroundColor: Colors.grey[800],
         radius: 15,
         child: Text(
-          "$rank",
+          '$rank',
           style: const TextStyle(color: Colors.white, fontSize: 12),
         ),
       ),

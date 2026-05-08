@@ -2,15 +2,22 @@ import 'package:pacman_application/game/animation/sprite_animation.dart';
 import 'package:pacman_application/game/direction.dart';
 import 'package:pacman_application/game/ghosts/ghost.dart';
 
+/// Pinky (the pink ghost) — the ambusher.
+///
+/// Chase strategy: targets the tile **4 steps ahead** of Pac-Man's current
+/// direction (stopping earlier if a wall is in the way), attempting to
+/// cut Pac-Man off at the front.
+/// Scatter corner: **top-left** of the maze.
 class Pinky extends Ghost {
+  /// Creates [Pinky] and registers optional death/eaten callbacks.
+  Pinky({required super.gameManager, super.onDeath, super.onEaten});
+
+  // ── Identity ──────────────────────────────────────────────────────────────
+
   @override
   String name = "Pinky";
 
-  @override
-  Direction currentDirection = Direction.left;
-
-  @override
-  Direction nextDirection = Direction.left;
+  // ── Position ──────────────────────────────────────────────────────────────
 
   @override
   double x = 13;
@@ -19,13 +26,32 @@ class Pinky extends Ghost {
   double y = 14;
 
   @override
-  SpriteAnimation get idle => down;
-
-  Pinky({required super.gameManager, super.onDeath, super.onEaten});
-
-  @override
   (int x, int y) startingPosition = (13, 14);
 
+  // ── Direction ─────────────────────────────────────────────────────────────
+
+  @override
+  Direction currentDirection = Direction.left;
+
+  @override
+  Direction nextDirection = Direction.left;
+
+  // ── Animation ─────────────────────────────────────────────────────────────
+
+  @override
+  SpriteAnimation get idleAnimation => down;
+
+  // ── Scatter corner ────────────────────────────────────────────────────────
+
+  @override
+  (int, int) scatterLocation = (1, 1);
+
+  // ── Chase behaviour ───────────────────────────────────────────────────────
+
+  /// Targets the tile up to 4 steps ahead of Pac-Man's facing direction.
+  ///
+  /// Walks forward along Pac-Man's direction until a wall is hit or 4 tiles
+  /// have been counted, then uses that tile as the BFS target.
   @override
   void chase(
     double dt,
@@ -34,25 +60,26 @@ class Pinky extends Ghost {
     Direction pacmanDirection,
   ) {
     hasStartedFrightenedMode = false;
-    int i;
-    for (i = 0; i < 4; i++) {
+
+    // Find how far ahead Pac-Man's path is clear (up to 4 tiles).
+    int steps;
+    for (steps = 0; steps < 4; steps++) {
       if (getGameMap().isWall(
-        x.round() + i * pacmanDirection.toDelta().$1,
-        y.round() + i * pacmanDirection.toDelta().$2,
+        pacmanX.round() + steps * pacmanDirection.toDelta().$1,
+        pacmanY.round() + steps * pacmanDirection.toDelta().$2,
         pacmanDirection,
       )) {
         break;
       }
     }
-    var direction = ghostChase(
-      pacmanX.round() + i * pacmanDirection.toDelta().$1,
-      pacmanY.round() + i * pacmanDirection.toDelta().$2,
+
+    final direction = ghostChase(
+      pacmanX.round() + steps * pacmanDirection.toDelta().$1,
+      pacmanY.round() + steps * pacmanDirection.toDelta().$2,
       x.round(),
       y.round(),
     );
-    if (direction != null) {
-      nextDirection = direction;
-    }
+    if (direction != null) nextDirection = direction;
 
     if (nextDirection != currentDirection &&
         !getGameMap().isWall(x.round(), y.round(), nextDirection)) {
@@ -67,22 +94,6 @@ class Pinky extends Ghost {
       return;
     }
 
-    switch (currentDirection) {
-      case Direction.up:
-        y -= speed * dt;
-        break;
-      case Direction.down:
-        y += speed * dt;
-        break;
-      case Direction.left:
-        x -= speed * dt;
-        break;
-      case Direction.right:
-        x += speed * dt;
-        break;
-    }
+    stepForward(dt);
   }
-
-  @override
-  (int, int) scatterLocation = (1, 1);
 }

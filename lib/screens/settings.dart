@@ -6,6 +6,14 @@ import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Allows the player to customise the colours of Pac-Man, each ghost, and
+/// the maze walls.
+///
+/// Each element has its own colour picker (a [HueRingPicker] shown in an
+/// [AlertDialog]) and a reset button that restores the game's original colour.
+/// A global "Reset Settings" button at the bottom reverts every element at
+/// once. Colour choices are persisted via [SharedPreferences] so they survive
+/// app restarts.
 class Settings extends StatefulWidget {
   const Settings({super.key});
 
@@ -14,109 +22,32 @@ class Settings extends StatefulWidget {
 }
 
 class SettingsState extends State<Settings> {
-  Color pacmanPickedColor = pacmanColor;
-  Color blinkyPickedColor = blinkyColor;
-  Color pinkyPickedColor = pinkyColor;
-  Color inkyPickedColor = inkyColor;
-  Color clydePickedColor = clydeColor;
-  Color mapPickedColor = mapColor;
+  // ── Fields ───────────────────────────────────────────────────────────────
+
+  /// Currently selected colour for Pac-Man.
+  Color _pacmanColor = pacmanColor;
+
+  /// Currently selected colour for Blinky (red ghost).
+  Color _blinkyColor = blinkyColor;
+
+  /// Currently selected colour for Pinky (pink ghost).
+  Color _pinkyColor = pinkyColor;
+
+  /// Currently selected colour for Inky (cyan ghost).
+  Color _inkyColor = inkyColor;
+
+  /// Currently selected colour for Clyde (orange ghost).
+  Color _clydeColor = clydeColor;
+
+  /// Currently selected colour for the maze walls.
+  Color _mapColor = mapColor;
+
+  // ── Lifecycle ────────────────────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
-
-    getColor();
-  }
-
-  void getColor() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    var a = prefs.getInt("pacmanColor/a");
-    var r = prefs.getInt("pacmanColor/r");
-    var g = prefs.getInt("pacmanColor/g");
-    var b = prefs.getInt("pacmanColor/b");
-    if (a == null || r == null || g == null || b == null) {
-      return;
-    }
-    pacmanPickedColor = Color.fromARGB(a, r, g, b);
-
-    a = prefs.getInt("blinkyColor/a");
-    r = prefs.getInt("blinkyColor/r");
-    g = prefs.getInt("blinkyColor/g");
-    b = prefs.getInt("blinkyColor/b");
-
-    if (a == null || r == null || g == null || b == null) {
-      return;
-    }
-    blinkyPickedColor = Color.fromARGB(a, r, g, b);
-
-    a = prefs.getInt("pinkyColor/a");
-    r = prefs.getInt("pinkyColor/r");
-    g = prefs.getInt("pinkyColor/g");
-    b = prefs.getInt("pinkyColor/b");
-
-    if (a == null || r == null || g == null || b == null) {
-      return;
-    }
-    pinkyPickedColor = Color.fromARGB(a, r, g, b);
-
-    a = prefs.getInt("inkyColor/a");
-    r = prefs.getInt("inkyColor/r");
-    g = prefs.getInt("inkyColor/g");
-    b = prefs.getInt("inkyColor/b");
-
-    if (a == null || r == null || g == null || b == null) {
-      return;
-    }
-    inkyPickedColor = Color.fromARGB(a, r, g, b);
-
-    a = prefs.getInt("clydeColor/a");
-    r = prefs.getInt("clydeColor/r");
-    g = prefs.getInt("clydeColor/g");
-    b = prefs.getInt("clydeColor/b");
-
-    if (a == null || r == null || g == null || b == null) {
-      return;
-    }
-    clydePickedColor = Color.fromARGB(a, r, g, b);
-
-    a = prefs.getInt("mapColor/a");
-    r = prefs.getInt("mapColor/r");
-    g = prefs.getInt("mapColor/g");
-    b = prefs.getInt("mapColor/b");
-
-    if (a == null || r == null || g == null || b == null) {
-      return;
-    }
-    mapPickedColor = Color.fromARGB(a, r, g, b);
-
-    setState(() {});
-  }
-
-  int floatToInt8(double x) {
-    return (x * 255.0).round().clamp(0, 255);
-  }
-
-  Color getChracterColor(String character) {
-    return switch (character) {
-      "pacman" => pacmanPickedColor,
-      "blinky" => blinkyPickedColor,
-      "pinky" => pinkyPickedColor,
-      "inky" => inkyPickedColor,
-      "clyde" => clydePickedColor,
-      "map" => mapPickedColor,
-      _ => Colors.transparent,
-    };
-  }
-
-  void saveColor(String character) async {
-    final prefs = await SharedPreferences.getInstance();
-    final color = getChracterColor(character);
-
-    prefs.setInt("${character}Color/a", floatToInt8(color.a));
-    prefs.setInt("${character}Color/r", floatToInt8(color.r));
-    prefs.setInt("${character}Color/g", floatToInt8(color.g));
-    prefs.setInt("${character}Color/b", floatToInt8(color.b));
+    _loadColors();
   }
 
   @override
@@ -125,46 +56,175 @@ class SettingsState extends State<Settings> {
       DeviceOrientation.portraitDown,
       DeviceOrientation.portraitUp,
     ]);
-
     super.dispose();
   }
 
-  void colorDialog(BuildContext context, String character) async {
-    return showDialog(
+  // ── Build ────────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: Appbar(
       context: context,
-      builder: (context) => AlertDialog(
+      header: Text('SETTINGS', style: headerTextStyle),
+    ),
+    drawer: const Sidebar(),
+    body: SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+        child: Center(
+          child: Column(
+            spacing: 40,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Here you can change the colors\nof the game elements',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+
+              const Spacer(),
+
+              _colorPickerRow('pacman'),
+              _colorPickerRow('blinky'),
+              _colorPickerRow('pinky'),
+              _colorPickerRow('inky'),
+              _colorPickerRow('clyde'),
+              _colorPickerRow('map'),
+
+              const Spacer(),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _resetPacmanColor();
+                        _resetBlinkyColor();
+                        _resetPinkyColor();
+                        _resetInkyColor();
+                        _resetClydeColor();
+                        _resetMapColor();
+                      });
+                    },
+                    child: const Text(
+                      'Reset Settings',
+                      style: TextStyle(
+                        fontFamily: 'PressStart',
+                        fontSize: 17,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  // ── Private helpers ──────────────────────────────────────────────────────
+
+  /// Loads all persisted colour preferences from [SharedPreferences] and
+  /// updates the corresponding state fields, triggering a rebuild.
+  void _loadColors() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    Color? loaded;
+
+    loaded = _readColorPrefs(prefs, 'pacman');
+    if (loaded != null) _pacmanColor = loaded;
+
+    loaded = _readColorPrefs(prefs, 'blinky');
+    if (loaded != null) _blinkyColor = loaded;
+
+    loaded = _readColorPrefs(prefs, 'pinky');
+    if (loaded != null) _pinkyColor = loaded;
+
+    loaded = _readColorPrefs(prefs, 'inky');
+    if (loaded != null) _inkyColor = loaded;
+
+    loaded = _readColorPrefs(prefs, 'clyde');
+    if (loaded != null) _clydeColor = loaded;
+
+    loaded = _readColorPrefs(prefs, 'map');
+    if (loaded != null) _mapColor = loaded;
+
+    setState(() {});
+  }
+
+  /// Reads the ARGB components for [character] from [prefs] and returns the
+  /// reconstructed [Color], or `null` if any component is missing.
+  Color? _readColorPrefs(SharedPreferences prefs, String character) {
+    final a = prefs.getInt('${character}Color/a');
+    final r = prefs.getInt('${character}Color/r');
+    final g = prefs.getInt('${character}Color/g');
+    final b = prefs.getInt('${character}Color/b');
+    if (a == null || r == null || g == null || b == null) return null;
+    return Color.fromARGB(a, r, g, b);
+  }
+
+  /// Converts a double colour channel value in [0, 1] to an 8-bit integer
+  /// in [0, 255].
+  int _floatToInt8(double x) => (x * 255.0).round().clamp(0, 255);
+
+  /// Returns the currently selected [Color] for [character].
+  Color _getCharacterColor(String character) {
+    return switch (character) {
+      'pacman' => _pacmanColor,
+      'blinky' => _blinkyColor,
+      'pinky'  => _pinkyColor,
+      'inky'   => _inkyColor,
+      'clyde'  => _clydeColor,
+      'map'    => _mapColor,
+      _        => Colors.transparent,
+    };
+  }
+
+  /// Persists the current colour for [character] to [SharedPreferences].
+  void _saveColor(String character) async {
+    final prefs = await SharedPreferences.getInstance();
+    final color = _getCharacterColor(character);
+
+    await prefs.setInt('${character}Color/a', _floatToInt8(color.a));
+    await prefs.setInt('${character}Color/r', _floatToInt8(color.r));
+    await prefs.setInt('${character}Color/g', _floatToInt8(color.g));
+    await prefs.setInt('${character}Color/b', _floatToInt8(color.b));
+  }
+
+  /// Opens a colour-picker dialog for [character]. The selected colour is
+  /// applied in real time and saved when the user confirms.
+  void _showColorDialog(BuildContext context, String character) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
         title: Center(
           child: Text(
-            "Change ${character[0].toUpperCase()}${character.substring(1)} color",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            'Change ${character[0].toUpperCase()}${character.substring(1)} color',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
         ),
         content: SizedBox(
           height: (MediaQuery.of(context).size.height / 3).clamp(370, 600),
           child: HueRingPicker(
-            pickerColor: getChracterColor(character),
+            pickerColor: _getCharacterColor(character),
             onColorChanged: (Color color) {
               setState(() {
                 switch (character) {
-                  case "pacman":
-                    pacmanPickedColor = color;
-                    break;
-                  case "blinky":
-                    blinkyPickedColor = color;
-                    break;
-                  case "pinky":
-                    pinkyPickedColor = color;
-                    break;
-                  case "inky":
-                    inkyPickedColor = color;
-                    break;
-                  case "clyde":
-                    clydePickedColor = color;
-                    break;
-                  case "map":
-                    mapPickedColor = color;
-                    break;
+                  case 'pacman': _pacmanColor = color;
+                  case 'blinky': _blinkyColor = color;
+                  case 'pinky':  _pinkyColor  = color;
+                  case 'inky':   _inkyColor   = color;
+                  case 'clyde':  _clydeColor  = color;
+                  case 'map':    _mapColor    = color;
                 }
               });
             },
@@ -173,162 +233,64 @@ class SettingsState extends State<Settings> {
         actions: [
           ElevatedButton(
             onPressed: () {
-              saveColor(character);
+              _saveColor(character);
               Navigator.of(context).pop();
             },
-            child: const Text("Got it"),
+            child: const Text('Got it'),
           ),
         ],
       ),
     );
   }
 
-  void resetPacmanColor() {
-    pacmanPickedColor = pacmanColor;
-    saveColor("pacman");
+  // ── Reset helpers ────────────────────────────────────────────────────────
+
+  void _resetPacmanColor() { _pacmanColor = pacmanColor; _saveColor('pacman'); }
+  void _resetBlinkyColor() { _blinkyColor = blinkyColor; _saveColor('blinky'); }
+  void _resetPinkyColor()  { _pinkyColor  = pinkyColor;  _saveColor('pinky'); }
+  void _resetInkyColor()   { _inkyColor   = inkyColor;   _saveColor('inky'); }
+  void _resetClydeColor()  { _clydeColor  = clydeColor;  _saveColor('clyde'); }
+  void _resetMapColor()    { _mapColor    = mapColor;     _saveColor('map'); }
+
+  /// Resets the colour of [character] to its default value and saves it.
+  void _resetColor(String character) {
+    setState(() {
+      switch (character) {
+        case 'pacman': _resetPacmanColor();
+        case 'blinky': _resetBlinkyColor();
+        case 'pinky':  _resetPinkyColor();
+        case 'inky':   _resetInkyColor();
+        case 'clyde':  _resetClydeColor();
+        case 'map':    _resetMapColor();
+      }
+    });
   }
 
-  void resetBlinkyColor() {
-    blinkyPickedColor = blinkyColor;
-    saveColor("blinky");
-  }
+  // ── Widget builders ──────────────────────────────────────────────────────
 
-  void resetPinkyColor() {
-    pinkyPickedColor = pinkyColor;
-    saveColor("pinky");
-  }
-
-  void resetInkyColor() {
-    inkyPickedColor = inkyColor;
-    saveColor("inky");
-  }
-
-  void resetClydeColor() {
-    clydePickedColor = clydeColor;
-    saveColor("clyde");
-  }
-
-  void resetMapColor() {
-    mapPickedColor = mapColor;
-    saveColor("map");
-  }
-
-  void resetColor(String character) {
-    switch (character) {
-      case "pacman":
-        resetPacmanColor();
-        break;
-      case "blinky":
-        resetBlinkyColor();
-        break;
-      case "pinky":
-        resetPinkyColor();
-        break;
-      case "inky":
-        resetInkyColor();
-        break;
-      case "clyde":
-        resetClydeColor();
-        break;
-      case "map":
-        resetMapColor();
-        break;
-    }
-  }
-
-  Widget pickedColorWidget(String character) {
+  /// Builds a row containing a colour-picker button (labelled with
+  /// [character]'s name in its current colour) and a reset icon button.
+  Widget _colorPickerRow(String character) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       spacing: 20,
       children: [
         ElevatedButton(
-          onPressed: () => colorDialog(context, character),
+          onPressed: () => _showColorDialog(context, character),
           child: Text(
-            "${character[0].toUpperCase()}${character.substring(1)} Color",
+            '${character[0].toUpperCase()}${character.substring(1)} Color',
             style: TextStyle(
-              fontFamily: "PressStart",
-              color: getChracterColor(character),
+              fontFamily: 'PressStart',
+              color: _getCharacterColor(character),
             ),
           ),
         ),
         IconButton(
-          onPressed: () {
-            setState(() {
-              resetColor(character);
-            });
-          },
-          icon: Icon(Icons.restore_rounded),
+          onPressed: () => _resetColor(character),
+          icon: const Icon(Icons.restore_rounded),
         ),
       ],
     );
   }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: Appbar(
-      context: context,
-      header: Text("SETTINGS", style: headerTextStyle),
-    ),
-    drawer: Sidebar(),
-    body: SafeArea(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-        child: Center(
-          child: Column(
-            spacing: 40,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Here you can change the colors\nof the game elements",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-              Spacer(),
-
-              pickedColorWidget("pacman"),
-              pickedColorWidget("blinky"),
-              pickedColorWidget("pinky"),
-              pickedColorWidget("inky"),
-              pickedColorWidget("clyde"),
-              pickedColorWidget("map"),
-              Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        resetPacmanColor();
-                        resetBlinkyColor();
-                        resetPinkyColor();
-                        resetInkyColor();
-                        resetClydeColor();
-                        resetMapColor();
-                      });
-                    },
-                    child: Text(
-                      "Reset Settings",
-                      style: TextStyle(
-                        fontFamily: "PressStart",
-                        fontSize: 17,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // Spacer(),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
 }

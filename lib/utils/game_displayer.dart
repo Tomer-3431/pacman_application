@@ -6,6 +6,15 @@ import 'package:pacman_application/utils/bonus_type.dart';
 import 'package:pacman_application/game/game_manager.dart';
 import 'package:pacman_application/screens/home_screen.dart';
 
+/// Hosts and manages a live Pac-Man game session.
+///
+/// Responsibilities:
+/// - Creates and initialises a [GameManager] for the current game.
+/// - Pre-creates the next [GameManager] so a retry starts instantly.
+/// - Wires up game-event callbacks: [_onGameOver], [_onRetry], [_onExit],
+///   and [_onBonusCollected].
+/// - Persists high-score and collectable updates back to [currentUser] for
+///   authenticated players.
 class GameDisplayer extends StatefulWidget {
   const GameDisplayer({super.key});
 
@@ -14,78 +23,98 @@ class GameDisplayer extends StatefulWidget {
 }
 
 class GameDisplayerState extends State<GameDisplayer> {
-  late GameManager _gameManager;
-  late GameManager newGame;
+  // ── Fields ───────────────────────────────────────────────────────────────
 
-  final AudioPlayer audioPlayer = AudioPlayer();
+  /// The [GameManager] running the current game session.
+  late GameManager _gameManager;
+
+  /// A fully-constructed [GameManager] ready to start the moment the player
+  /// requests a retry, eliminating any initialisation delay.
+  late GameManager _nextGame;
+
+  /// Audio player used by the game (currently stopped on entry so the home
+  /// screen music does not overlap).
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // ── Lifecycle ────────────────────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
-    
-    audioPlayer.setReleaseMode(ReleaseMode.loop);
-    audioPlayer.stop();
 
-    _gameManager = GameManager(
-      highScore: () => currentUser.highScore,
-      onGameOver: onGameOver,
-      onRetry: onRetry,
-      onExit: onExit,
-      onGettingBonus: onGettingBonus
-    );
-    newGame = GameManager(
-      highScore: () => currentUser.highScore,
-      onGameOver: onGameOver,
-      onRetry: onRetry,
-      onExit: onExit,
-      onGettingBonus: onGettingBonus
-    );
+    _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    _audioPlayer.stop();
+
+    _gameManager = _buildGameManager();
+    _nextGame = _buildGameManager();
     _gameManager.initGame();
   }
 
-  void onGameOver(int score) {
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
+    super.dispose();
+  }
+
+  // ── Build ────────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) =>
+      Scaffold(body: _gameManager.currentScreen);
+
+  // ── Private helpers ──────────────────────────────────────────────────────
+
+  /// Factory that creates a [GameManager] with all callbacks bound to this
+  /// state. Extracted to avoid duplicating the constructor call.
+  GameManager _buildGameManager() => GameManager(
+    highScore: () => currentUser.highScore,
+    onGameOver: _onGameOver,
+    onRetry: _onRetry,
+    onExit: _onExit,
+    onGettingBonus: _onBonusCollected,
+  );
+
+  /// Called by [GameManager] when the game ends with [score].
+  ///
+  /// Updates [currentUser]'s high score if [score] is a new personal best,
+  /// and the player is not in a guest session.
+  void _onGameOver(int score) {
     if (score > currentUser.highScore && !isAnonymous) {
       currentUser.highScore = score;
     }
   }
 
-  void onRetry() {
+  /// Called by [GameManager] when the player taps "Retry".
+  ///
+  /// Swaps in the pre-built [_nextGame] as the active session and creates a
+  /// fresh replacement ready for the next potential retry.
+  void _onRetry() {
     setState(() {
-      _gameManager = newGame;
+      _gameManager = _nextGame;
       _gameManager.initGame();
-      newGame = GameManager(
-        highScore: () => currentUser.highScore,
-        onGameOver: onGameOver,
-        onRetry: onRetry,
-        onExit: onExit,
-        onGettingBonus: onGettingBonus
-      );
+      _nextGame = _buildGameManager();
     });
   }
 
-  void onExit() {
+  /// Called by [GameManager] when the player taps "Exit".
+  ///
+  /// Navigates back to [HomeScreen].
+  void _onExit() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
   }
 
-  void onGettingBonus(BonusType bonusType) {
+  /// Called by [GameManager] when the player collects a bonus of [bonusType].
+  ///
+  /// Increments the bonus count in [currentUser] for authenticated players.
+  void _onBonusCollected(BonusType bonusType) {
     if (!isAnonymous) {
       currentUser.addBonus(bonusType);
     }
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.portraitUp,
-    ]);
-  }
-
-  @override
-  Widget build(BuildContext context) =>
-      Scaffold(body: _gameManager.currentScreen);
 }

@@ -6,6 +6,12 @@ import 'package:pacman_application/utils/appbar.dart';
 import 'package:pacman_application/utils/sidebar.dart';
 import 'package:pacman_application/utils/bonus_card.dart';
 
+/// Displays the player's full collectable item collection in a 2-column grid.
+///
+/// Each grid cell is rendered by a [BonusCard] widget. Cards for items the
+/// player has not yet obtained are shown in greyscale with a strikethrough
+/// label; collected items are shown in full colour and open a detail dialog
+/// on tap.
 class CollectablesScreen extends StatefulWidget {
   const CollectablesScreen({super.key});
 
@@ -14,45 +20,49 @@ class CollectablesScreen extends StatefulWidget {
 }
 
 class CollectablesScreenState extends State<CollectablesScreen> {
-  
+  // ── Lifecycle ────────────────────────────────────────────────────────────
+
   @override
   void dispose() {
+    // Restore portrait orientation when leaving the screen.
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitDown,
-      DeviceOrientation.portraitUp
+      DeviceOrientation.portraitUp,
     ]);
-
     super.dispose();
   }
+
+  // ── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: Appbar(
       context: context,
-      header: Text("COLLECTABLES", style: headerTextStyle),
+      header: Text('COLLECTABLES', style: headerTextStyle),
     ),
-    drawer: Sidebar(),
+    drawer: const Sidebar(),
     body: SafeArea(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Here is all the collectable you have got!",
+            const Text(
+              'Here is all the collectables you have got!',
               style: TextStyle(fontSize: 20, color: Colors.black),
               textAlign: TextAlign.center,
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
+            // 2-column grid of one BonusCard per BonusType.
             GridView.builder(
               shrinkWrap: true,
               itemCount: BonusType.values.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
               ),
-              itemBuilder: (context, i) => BonusCard(i),
+              itemBuilder: (_, i) => BonusCard(i),
             ),
           ],
         ),

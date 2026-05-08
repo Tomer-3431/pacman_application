@@ -16,199 +16,28 @@ import 'package:pacman_application/game/ghosts/inky.dart';
 import 'package:pacman_application/game/ghosts/pinky.dart';
 import 'package:pacman_application/game/pacman.dart';
 
+// ── Audio state ────────────────────────────────────────────────────────────
+
+/// Describes which audio loop the game should currently be playing.
+enum _AudioState { idle, normal, blue, eye }
+
+/// Central controller for the Pac-Man game.
+///
+/// [GameManager] owns all game objects ([gameMap], [pacman], [ghosts],
+/// [bonus]) and drives the main game loop via a [Timer.periodic].  It handles:
+/// - Score / lives / high score tracking.
+/// - Ghost state transitions (chase ↔ scatter toggle every 5 s).
+/// - Frightened-mode timers after a super-dot is eaten.
+/// - Bonus item scheduling.
+/// - Death / game-over flow.
+/// - Audio state machine.
+///
+/// Pass `start: true` to [GameManager] to begin the game immediately, or call
+/// [initGame] manually once the widget tree is ready.
 class GameManager {
-  int score = 0;
-  int highScore = 0;
-  int screenNum = 0;
-  int nextGhostEatenScore = 10;
-
-  late List<GameTimer> gameTimers = [bonusTimer];
-
-  late final GameMap gameMap = GameMap(
-    map: defaultMap,
-    onDotEaten: () {
-      if ((score % 100) >= 99) {
-        lives++;
-      }
-      score += 1;
-    },
-    onSuperDotEaten: () {
-      if ((score % 100) >= 90) lives++;
-      score += 10;
-      for (var ghosts in ghosts) {
-        ghosts.state = GhostState.frightened0;
-      }
-      gameTimers.add(
-        GameTimer(
-          8,
-          onEnd: () {
-            for (var ghost in ghosts) {
-              if (ghost.state == GhostState.frightened0) {
-                ghost.state = GhostState.frightened1;
-              }
-            }
-          },
-          isOn: true,
-        ),
-      );
-      gameTimers.add(
-        GameTimer(
-          10,
-          onEnd: () {
-            for (var ghost in ghosts) {
-              if (ghost.state == GhostState.frightened1) {
-                ghost.state = GhostState.chase;
-                nextGhostEatenScore = 10;
-              }
-            }
-          },
-          isOn: true,
-        ),
-      );
-    },
-  );
-
-  late final Pacman pacman = Pacman(gameManager: this);
-
-  bool isGameOver = false;
-
-  late final Controller controller = Controller(
-    onDirectionChanged: (direction) {
-      pacman.nextDirection = direction;
-    },
-  );
-
-  late GameScreen currentScreen = GameScreen(
-    gameMessage: (x) => gameMessage(x),
-    gameMap: gameMap,
-    controller: controller,
-    pacman: pacman,
-    ghosts: ghosts,
-    getScore: () => score,
-    getLives: () => lives,
-    dt: dt,
-    bonus: bonus,
-    bonusesTaken: bonusesTaken,
-    getHighScore: () => highScore,
-    isGameOver: () => isGameOver,
-    endGameButtons: endGameButtons,
-  );
-
-  late EndGameButtons endGameButtons = EndGameButtons(
-    size: 120,
-    onRetry: onRetry,
-    onExit: onExit,
-  );
-
-  bool paused = false;
-
-  void onDeath() {
-    paused = true;
-
-    _audioPlayer.setReleaseMode(ReleaseMode.release);
-    _audioPlayer.play(AssetSource("audio/Fail.mp3"));
-    _currentAudioState = AudioState.idle;
-    pacman.playDeath();
-
-    Timer(Duration(seconds: 3), () {
-      paused = false;
-      for (var ghost in ghosts) {
-        ghost.reset();
-      }
-      pacman.reset();
-      // gameMap.reset();
-      lives--;
-      if (lives <= 0) {
-        isGameOver = true;
-
-        gameMessage = (double tileSize) => Positioned(
-          top: tileSize * 16.3,
-          left: tileSize * 9.3,
-          child: Center(
-            child: Text(
-              "GAME OVER",
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: "PressStart"
-              ),
-            ),
-          ),
-        );
-        for (var ghost in ghosts) {
-          ghost.state = GhostState.idle;
-        }
-        periodicTimer.cancel();
-        _audioPlayer.stop();
-        _audioPlayer.dispose();
-        onGameOver.call(score);
-      }
-    });
-  }
-
-  void onEaten() {
-    paused = true;
-    if (100 - (score % 100) <= nextGhostEatenScore) lives++;
-    score += nextGhostEatenScore;
-    nextGhostEatenScore *= 2;
-    Timer(Duration(microseconds: 500), () => paused = false);
-  }
-
-  late final List<Ghost> ghosts = [
-    Blinky(gameManager: this, onDeath: onDeath, onEaten: onEaten),
-    Pinky(gameManager: this, onDeath: onDeath, onEaten: onEaten),
-    Inky(gameManager: this, onDeath: onDeath, onEaten: onEaten),
-    Clyde(gameManager: this, onDeath: onDeath, onEaten: onEaten),
-  ];
-
-  int lives = 3;
-  Widget Function(double tileSize) gameMessage = (double tileSize) => Positioned(
-    top: 16.2 * tileSize,
-    left: 10.5 * tileSize,
-    child: Center(
-      child: Text(
-        "READY!",
-        style: TextStyle(
-          color: pacmanColor,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          fontFamily: "PressStart",
-        ),
-      ),
-    ),
-  );
-
-  final double dt = 0.001;
-  late Timer periodicTimer;
-  late Stopwatch stopwatch = Stopwatch();
-  double lastTime = 0;
-
-  void onBonus(BonusType type) {
-    bonusesTaken.add(type);
-    if (score % 100 >= 90) lives++;
-    score += 10;
-    onGettingBonus(type);
-  }
-
-  late List<BonusType> bonusesTaken = [];
-  late Bonus bonus = Bonus(gameManager: this, onEaten: onBonus);
-  late GameTimer bonusTimer = GameTimer(
-    10,
-    onEnd: () {
-      bonus.setVisible();
-    },
-    isLoop: true,
-  );
-
-  late void Function(int score) onGameOver;
-  late void Function() onRetry;
-  int Function()? getHighScoreFromDisplayer;
-  late void Function() onExit;
-  late void Function(BonusType) onGettingBonus;
-
-  final AudioPlayer _audioPlayer = AudioPlayer();
-
+  /// Creates a [GameManager], optionally starting the game loop immediately.
+  ///
+  /// All callback parameters are optional; pass them to wire up your UI.
   GameManager({
     bool start = false,
     int Function()? highScore,
@@ -217,66 +46,208 @@ class GameManager {
     void Function()? onExit,
     void Function(BonusType bonus)? onGettingBonus,
   }) {
-    if (onGameOver != null) {
-      this.onGameOver = onGameOver;
-    } else {
-      this.onGameOver = (x) {};
-    }
+    this.onGameOver      = onGameOver      ?? (_) {};
+    this.onRetry         = onRetry         ?? () {};
+    this.onExit          = onExit          ?? () {};
+    this.onGettingBonus  = onGettingBonus  ?? (_) {};
 
     if (highScore != null) {
       this.highScore = highScore();
-      getHighScoreFromDisplayer = highScore;
-    }
-
-    if (onRetry != null) {
-      this.onRetry = onRetry;
-    } else {
-      this.onRetry = () {};
-    }
-
-    if (onExit != null) {
-      this.onExit = onExit;
-    } else {
-      this.onExit = () {};
-    }
-
-    if (onGettingBonus != null) {
-      this.onGettingBonus = onGettingBonus;
-    } else {
-      this.onGettingBonus = (x) {};
+      _getHighScoreCallback = highScore;
     }
 
     if (start) initGame();
   }
 
+  // ── Scoring & progression ─────────────────────────────────────────────────
+
+  /// Current score for this session.
+  int score = 0;
+
+  /// All-time high score; updated live if [score] exceeds it.
+  int highScore = 0;
+
+  /// Index of the current maze screen (increments when all dots are cleared).
+  int screenNum = 0;
+
+  /// Points awarded for the next ghost eaten in the current frightened chain.
+  ///
+  /// Starts at 10 and doubles with each consecutive ghost eaten.
+  int nextGhostEatenScore = 10;
+
+  /// Remaining lives.  Game over when this reaches 0.
+  int lives = 3;
+
+  // ── Flags ─────────────────────────────────────────────────────────────────
+
+  /// Whether the game is currently paused (death animation, level transition).
+  bool isPaused = false;
+
+  /// Whether the game has ended.
+  bool isGameOver = false;
+
+  /// Prevents triggering the next-screen transition more than once per clear.
+  bool _hasTriggeredNextScreen = false;
+
+  // ── Game objects ──────────────────────────────────────────────────────────
+
+  /// The game map (tiles, dots, super-dots, layout constants).
+  late final GameMap gameMap = GameMap(
+    map: defaultMap,
+    onDotEaten: _onDotEaten,
+    onSuperDotEaten: _onSuperDotEaten,
+  );
+
+  /// The player-controlled Pac-Man character.
+  late final Pacman pacman = Pacman(gameManager: this);
+
+  /// All four ghosts in order: Blinky, Pinky, Inky, Clyde.
+  late final List<Ghost> ghosts = [
+    Blinky(gameManager: this, onDeath: _onDeath, onEaten: _onGhostEaten),
+    Pinky (gameManager: this, onDeath: _onDeath, onEaten: _onGhostEaten),
+    Inky  (gameManager: this, onDeath: _onDeath, onEaten: _onGhostEaten),
+    Clyde (gameManager: this, onDeath: _onDeath, onEaten: _onGhostEaten),
+  ];
+
+  /// The bonus item that periodically appears in the centre of the maze.
+  late final Bonus bonus = Bonus(gameManager: this, onEaten: _onBonusEaten);
+
+  /// Bonuses collected this session (shown as icons on screen).
+  late final List<BonusType> bonusesTaken = [];
+
+  // ── Timers ────────────────────────────────────────────────────────────────
+
+  /// Game-loop delta-time in seconds.
+  final double dt = 0.001;
+
+  /// All active [GameTimer] instances updated each tick.
+  late final List<GameTimer> _gameTimers = [_bonusTimer];
+
+  /// Periodically makes the bonus item visible (every 10 s, looping).
+  late final GameTimer _bonusTimer = GameTimer(
+    10,
+    onEnd: () => bonus.setVisible(),
+    isLoop: true,
+  );
+
+  /// Main [Timer.periodic] that drives the game loop.
+  late Timer _periodicTimer;
+
+  /// High-precision stopwatch used to calculate real-elapsed delta-time.
+  late final Stopwatch _stopwatch = Stopwatch();
+
+  /// Timestamp of the last tick in seconds (used to compute real dt).
+  double _lastTickTime = 0;
+
+  // ── UI components ─────────────────────────────────────────────────────────
+
+  /// The on-screen D-pad; wired to update [pacman.nextDirection].
+  late final Controller controller = Controller(
+    onDirectionChanged: (direction) => pacman.nextDirection = direction,
+  );
+
+  /// Retry / Exit buttons shown after game over.
+  late final EndGameButtons endGameButtons = EndGameButtons(
+    size: 120,
+    onRetry: onRetry,
+    onExit: onExit,
+  );
+
+  /// The main game screen widget.
+  late final GameScreen currentScreen = GameScreen(
+    gameMessage:    (x) => _gameMessage(x),
+    gameMap:        gameMap,
+    controller:     controller,
+    pacman:         pacman,
+    ghosts:         ghosts,
+    getScore:       () => score,
+    getLives:       () => lives,
+    dt:             dt,
+    bonus:          bonus,
+    bonusesTaken:   bonusesTaken,
+    getHighScore:   () => highScore,
+    isGameOver:     () => isGameOver,
+    endGameButtons: endGameButtons,
+  );
+
+  // ── In-game message overlay ───────────────────────────────────────────────
+
+  /// Builder for the overlay text (e.g. "READY!", "GAME OVER", empty widget).
+  Widget Function(double tileSize) _gameMessage = (double tileSize) =>
+      Positioned(
+        top: 16.2 * tileSize,
+        left: 10.5 * tileSize,
+        child: Center(
+          child: Text(
+            "READY!",
+            style: TextStyle(
+              color: pacmanColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: "PressStart",
+            ),
+          ),
+        ),
+      );
+
+  // ── External callbacks ────────────────────────────────────────────────────
+
+  /// Called with the final score when the game ends.
+  late final void Function(int score) onGameOver;
+
+  /// Called when the player chooses to retry.
+  late final void Function() onRetry;
+
+  /// Called when the player chooses to exit.
+  late final void Function() onExit;
+
+  /// Called each time Pac-Man collects a bonus item.
+  late final void Function(BonusType) onGettingBonus;
+
+  /// Optional callback that returns the persisted high score from the UI layer.
+  int Function()? _getHighScoreCallback;
+
+  // ── Audio ─────────────────────────────────────────────────────────────────
+
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  _AudioState _currentAudioState = _AudioState.idle;
+
+  // ── Public API ────────────────────────────────────────────────────────────
+
+  /// Starts the game: plays the start jingle, then begins the game loop after
+  /// a 5-second countdown (matching the "READY!" display duration).
   void initGame() {
     _audioPlayer.play(AssetSource("audio/Start_Music.mp3"));
-    highScore = getHighScoreFromDisplayer?.call() ?? highScore;
-    Timer(Duration(seconds: 5), () {
-      gameMessage = (x) => Container();
-      bonusTimer.start();
-      stopwatch.start();
-      periodicTimer = Timer.periodic(
+    highScore = _getHighScoreCallback?.call() ?? highScore;
+
+    Timer(const Duration(seconds: 5), () {
+      _gameMessage = (x) => Container();
+      _bonusTimer.start();
+      _stopwatch.start();
+
+      _periodicTimer = Timer.periodic(
         Duration(milliseconds: (dt * 1000).toInt()),
         (timer) {
-          double realDT =
-              (stopwatch.elapsedMicroseconds / 1000000.0) - lastTime;
-          lastTime = stopwatch.elapsedMicroseconds / 1000000.0;
+          final realDt =
+              (_stopwatch.elapsedMicroseconds / 1_000_000.0) - _lastTickTime;
+          _lastTickTime = _stopwatch.elapsedMicroseconds / 1_000_000.0;
 
-          if (paused) {
-            pacman.updateDeathAnimation(realDT);
+          if (isPaused) {
+            pacman.updateDeathAnimation(realDt);
           } else {
-            for (var gameTimer in gameTimers) {
-              gameTimer.update(realDT);
+            for (final timer in _gameTimers) {
+              timer.update(realDt);
             }
-            update(realDT);
+            _update(realDt);
           }
         },
       );
     });
 
-    Timer.periodic(Duration(seconds: 5), (timer) {
-      for (var ghost in ghosts) {
+    // Toggle ghosts between chase and scatter every 5 seconds.
+    Timer.periodic(const Duration(seconds: 5), (_) {
+      for (final ghost in ghosts) {
         if (ghost.state == GhostState.chase) {
           ghost.state = GhostState.scatter;
         } else if (ghost.state == GhostState.scatter) {
@@ -286,81 +257,197 @@ class GameManager {
     });
   }
 
-  bool hasUpdatedNextScreen = false;
+  // ── Private game-loop ─────────────────────────────────────────────────────
 
-  void update(double dt) {
+  /// Called every tick while the game is not paused.
+  void _update(double dt) {
     pacman.update(dt);
-    for (var dot in gameMap.dots) {
+
+    for (final dot in gameMap.dots) {
       dot.checkIfEaten(pacman.x, pacman.y);
     }
-    for (var superDot in gameMap.superPoints) {
+    for (final superDot in gameMap.superDots) {
       superDot.checkIfEaten(pacman.x, pacman.y);
     }
-    Inky.setBlinkyLocation(ghosts[0].x, ghosts[0].y);
-    bonus.update(dt);
-    if (score > highScore) {
-      highScore = score;
-    }
 
-    final lastCurrentAudioState = _currentAudioState;
-    _currentAudioState = AudioState.normal;
-    for (var ghost in ghosts) {
+    // Keep Inky's static Blinky-position reference up to date.
+    Inky.setBlinkyPosition(ghosts[0].x, ghosts[0].y);
+
+    bonus.update(dt);
+
+    if (score > highScore) highScore = score;
+
+    // Update ghosts and determine audio state.
+    final previousAudioState = _currentAudioState;
+    _currentAudioState = _AudioState.normal;
+
+    for (final ghost in ghosts) {
       ghost.update(dt);
 
       switch (ghost.state) {
-        case GhostState.chase || GhostState.scatter:
-          break;
         case GhostState.frightened0 || GhostState.frightened1:
-          if (_currentAudioState == AudioState.normal) {
-            _currentAudioState = AudioState.blue;
+          if (_currentAudioState == _AudioState.normal) {
+            _currentAudioState = _AudioState.blue;
           }
-          break;
         case GhostState.eaten:
-          _currentAudioState = AudioState.eye;
-          break;
-        case GhostState.idle:
+          _currentAudioState = _AudioState.eye;
+        default:
           break;
       }
     }
 
+    // Switch audio track when state changes.
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    if (_currentAudioState != lastCurrentAudioState) {
+    if (_currentAudioState != previousAudioState) {
       switch (_currentAudioState) {
-        case AudioState.idle:
-          // _audioPlayer.stop();
+        case _AudioState.idle:
           break;
-        case AudioState.normal:
+        case _AudioState.normal:
           _audioPlayer.play(AssetSource("audio/Pacman_Eating_Dots.mp3"));
-          break;
-        case AudioState.blue:
+        case _AudioState.blue:
           _audioPlayer.play(AssetSource("audio/Ghost_Turn_To_Blue.mp3"));
-          break;
-        case AudioState.eye:
+        case _AudioState.eye:
           _audioPlayer.play(AssetSource("audio/Ghost_Return_To_Home.mp3"));
-          break;
       }
     }
 
-    if (!hasUpdatedNextScreen && gameMap.leftDots == 0) {
-      paused = true;
-      hasUpdatedNextScreen = true;
+    // Level clear — all dots collected.
+    if (!_hasTriggeredNextScreen && gameMap.remainingDots == 0) {
+      isPaused = true;
+      _hasTriggeredNextScreen = true;
 
-      Timer(Duration(microseconds: 750), () {
+      Timer(const Duration(microseconds: 750), () {
         screenNum++;
-        for (var ghost in ghosts) {
+        for (final ghost in ghosts) {
           ghost.reset();
         }
         pacman.reset();
         gameMap.reset();
-        Timer(Duration(seconds: 2), () {
-          paused = false;
-          hasUpdatedNextScreen = false;
+
+        Timer(const Duration(seconds: 2), () {
+          isPaused = false;
+          _hasTriggeredNextScreen = false;
         });
       });
     }
   }
 
-  AudioState _currentAudioState = AudioState.idle;
-}
+  // ── Collectible callbacks ─────────────────────────────────────────────────
 
-enum AudioState { idle, normal, blue, eye }
+  void _onDotEaten() {
+    if ((score % 100) >= 99) lives++;
+    score += 1;
+  }
+
+  void _onSuperDotEaten() {
+    if ((score % 100) >= 90) lives++;
+    score += 10;
+
+    for (final ghost in ghosts) {
+      ghost.state = GhostState.frightened0;
+    }
+
+    // After 8 s, switch frightened0 → frightened1 (warning flash).
+    _gameTimers.add(
+      GameTimer(
+        8,
+        onEnd: () {
+          for (final ghost in ghosts) {
+            if (ghost.state == GhostState.frightened0) {
+              ghost.state = GhostState.frightened1;
+            }
+          }
+        },
+        isOn: true,
+      ),
+    );
+
+    // After 10 s, end frightened mode entirely.
+    _gameTimers.add(
+      GameTimer(
+        10,
+        onEnd: () {
+          for (final ghost in ghosts) {
+            if (ghost.state == GhostState.frightened1) {
+              ghost.state = GhostState.chase;
+              nextGhostEatenScore = 10;
+            }
+          }
+        },
+        isOn: true,
+      ),
+    );
+  }
+
+  void _onBonusEaten(BonusType type) {
+    bonusesTaken.add(type);
+    if (score % 100 >= 90) lives++;
+    score += 10;
+    onGettingBonus(type);
+  }
+
+  // ── Death / game-over flow ────────────────────────────────────────────────
+
+  /// Handles Pac-Man's death: plays the death animation, resets characters,
+  /// decrements lives, and checks for game over.
+  void _onDeath() {
+    isPaused = true;
+
+    _audioPlayer.setReleaseMode(ReleaseMode.release);
+    _audioPlayer.play(AssetSource("audio/Fail.mp3"));
+    _currentAudioState = _AudioState.idle;
+    pacman.playDeath();
+
+    Timer(const Duration(seconds: 3), () {
+      isPaused = false;
+      for (final ghost in ghosts) {
+        ghost.reset();
+      }
+      pacman.reset();
+      lives--;
+
+      if (lives <= 0) {
+        _triggerGameOver();
+      }
+    });
+  }
+
+  /// Briefly pauses the game and awards score when Pac-Man eats a ghost.
+  void _onGhostEaten() {
+    isPaused = true;
+    if (100 - (score % 100) <= nextGhostEatenScore) lives++;
+    score += nextGhostEatenScore;
+    nextGhostEatenScore *= 2;
+    Timer(const Duration(microseconds: 500), () => isPaused = false);
+  }
+
+  /// Stops the game loop, shows "GAME OVER", and fires [onGameOver].
+  void _triggerGameOver() {
+    isGameOver = true;
+
+    _gameMessage = (double tileSize) => Positioned(
+      top: tileSize * 16.3,
+      left: tileSize * 9.3,
+      child: Center(
+        child: const Text(
+          "GAME OVER",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontFamily: "PressStart",
+          ),
+        ),
+      ),
+    );
+
+    for (final ghost in ghosts) {
+      ghost.state = GhostState.idle;
+    }
+
+    _periodicTimer.cancel();
+    _audioPlayer.stop();
+    _audioPlayer.dispose();
+    onGameOver(score);
+  }
+}

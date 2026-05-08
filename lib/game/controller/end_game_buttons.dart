@@ -1,130 +1,125 @@
-
 import 'package:flutter/material.dart';
 
+/// A pair of styled buttons shown at the end of the game: **RETRY** and **EXIT**.
+///
+/// Each button uses an [AnimatedContainer] to provide a pressed-state visual
+/// effect. [onRetry] and [onExit] are called as soon as the finger touches
+/// the button (not on release), matching arcade game feel.
 class EndGameButtons extends StatefulWidget {
+  const EndGameButtons({
+    super.key,
+    required this.size,
+    required this.onRetry,
+    required this.onExit,
+  });
+
+  /// Height of each button in logical pixels.
   final double size;
+
+  /// Called when the RETRY button is tapped.
   final VoidCallback onRetry;
+
+  /// Called when the EXIT button is tapped.
   final VoidCallback onExit;
 
-  const EndGameButtons({super.key, required this.size, required this.onRetry, required this.onExit});
-
   @override
-  State<EndGameButtons> createState() => EndGameButtonsState();
+  State<EndGameButtons> createState() => _EndGameButtonsState();
 }
 
-class EndGameButtonsState extends State<EndGameButtons> {
+class _EndGameButtonsState extends State<EndGameButtons> {
+  // ── State ─────────────────────────────────────────────────────────────────
+
   bool _isRetryPressed = false;
   bool _isExitPressed = false;
 
+  // ── Gesture handlers ──────────────────────────────────────────────────────
+
   void _startRetryPress() {
-    setState(() {
-      _isRetryPressed = true;
-    });
+    setState(() => _isRetryPressed = true);
     widget.onRetry();
   }
 
-  void _endRetryPress() {
-    setState(() {
-      _isRetryPressed = false;
-    });
-  }
+  void _endRetryPress() => setState(() => _isRetryPressed = false);
 
-  void _startExitPress(){
-    setState(() {
-      _isExitPressed = true;
-    });
+  void _startExitPress() {
+    setState(() => _isExitPressed = true);
     widget.onExit();
   }
 
-  void _endExitPress() {
-    setState(() {
-      _isExitPressed = false;
-    });
-  }
+  void _endExitPress() => setState(() => _isExitPressed = false);
+
+  // ── Widget ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisAlignment: MainAxisAlignment.start,
     children: [
-      GestureDetector(
-        onTapDown: (_) => _startRetryPress(),
-        onTapUp: (_) => _endRetryPress(),
-        onTapCancel: _endRetryPress,
-        child: AnimatedContainer(
-          margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
-          duration: Duration(microseconds: 80),
-          height: widget.size,
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: _isRetryPressed ? Colors.red[300] : Colors.red[900],
-            border: Border.all(
-              color: _isRetryPressed ? Colors.amber : Colors.grey[700]!,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: _isRetryPressed
-                ? []
-                : [
-                    BoxShadow(
-                      color: const Color(0x7F000000),
-                      offset: const Offset(0, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-          ),
-          child: Center(
-            child: Text(
-              "RETRY",
-              style: TextStyle(
-                fontSize: 40,
-                fontFamily: "PressStart",
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[900],
-              ),
-            ),
-          ),
-        ),
+      _buildButton(
+        label: "RETRY",
+        isPressed: _isRetryPressed,
+        onStart: _startRetryPress,
+        onEnd: _endRetryPress,
+        bottomMargin: 10,
       ),
-      GestureDetector(
-        onTapDown: (_) => _startExitPress(),
-        onTapUp: (_) => _endExitPress(),
-        onTapCancel: _endExitPress,
-        child: AnimatedContainer(
-          margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
-          duration: Duration(microseconds: 80),
-          height: widget.size,
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: _isExitPressed ? Colors.red[300] : Colors.red[900],
-            border: Border.all(
-              color: _isExitPressed ? Colors.amber : Colors.grey[700]!,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: _isExitPressed
-                ? []
-                : [
-                    BoxShadow(
-                      color: const Color(0x7F000000),
-                      offset: const Offset(0, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-          ),
-          child: Center(
-            child: Text(
-              "EXIT",
-              style: TextStyle(
-                fontSize: 40,
-                fontFamily: "PressStart",
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[900],
-              ),
-            ),
-          ),
-        ),
+      _buildButton(
+        label: "EXIT",
+        isPressed: _isExitPressed,
+        onStart: _startExitPress,
+        onEnd: _endExitPress,
+        bottomMargin: 0,
       ),
     ],
   );
+
+  // ── Private helpers ───────────────────────────────────────────────────────
+
+  /// Builds a single labelled button with pressed-state animation.
+  Widget _buildButton({
+    required String label,
+    required bool isPressed,
+    required VoidCallback onStart,
+    required VoidCallback onEnd,
+    required double bottomMargin,
+  }) {
+    return GestureDetector(
+      onTapDown: (_) => onStart(),
+      onTapUp: (_) => onEnd(),
+      onTapCancel: onEnd,
+      child: AnimatedContainer(
+        margin: EdgeInsets.fromLTRB(20, 10, 20, bottomMargin),
+        duration: const Duration(microseconds: 80),
+        height: widget.size,
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: isPressed ? Colors.red[300] : Colors.red[900],
+          border: Border.all(
+            color: isPressed ? Colors.amber : Colors.grey[700]!,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: isPressed
+              ? []
+              : const [
+                  BoxShadow(
+                    color: Color(0x7F000000),
+                    offset: Offset(0, 2),
+                    blurRadius: 4,
+                  ),
+                ],
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 40,
+              fontFamily: "PressStart",
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[900],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
