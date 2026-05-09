@@ -430,6 +430,9 @@ class _SignupState extends State<Signup> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    backgroundColor: _canContinue
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).focusColor,
                   ),
                   child: const Text(
                     'Continue',
